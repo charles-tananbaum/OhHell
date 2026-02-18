@@ -4,7 +4,7 @@ import { Lock, Eye, EyeOff } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
 export default function LoginGate({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, login, loadFromDb } = useStore();
+  const { userRole, login, loadFromDb } = useStore();
   const [input, setInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -22,7 +22,7 @@ export default function LoginGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (isAuthenticated) return <>{children}</>;
+  if (userRole) return <>{children}</>;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

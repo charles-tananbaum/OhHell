@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Player, Game, Round } from '../types';
-import { DEFAULT_ELO, SITE_PASSWORD, STORE_NAME } from '../constants';
+import { DEFAULT_ELO, ADMIN_PASSWORD, LIMITED_PASSWORD, STORE_NAME } from '../constants';
 import { generatePlayerId, generateGameId } from '../lib/ids';
 import {
   generateRoundSequence,
@@ -28,10 +28,12 @@ interface Toast {
   type: 'success' | 'error';
 }
 
+export type UserRole = 'admin' | 'limited' | false;
+
 interface StoreState {
   players: Player[];
   games: Game[];
-  isAuthenticated: boolean;
+  userRole: UserRole;
   toasts: Toast[];
   dbReady: boolean;
 
@@ -124,18 +126,24 @@ async function syncPlayer(player: Player, toast?: (msg: string, type: 'success' 
 export const useStore = create<StoreState>()((set, get) => ({
   players: [],
   games: [],
-  isAuthenticated: false,
+  userRole: false,
   toasts: [],
   dbReady: false,
 
-  // Auth — universal password
+  // Auth — admin gets full access, limited can add but not delete
   login: (password: string) => {
-    const valid = password === SITE_PASSWORD;
-    if (valid) set({ isAuthenticated: true });
-    return valid;
+    if (password === ADMIN_PASSWORD) {
+      set({ userRole: 'admin' });
+      return true;
+    }
+    if (password === LIMITED_PASSWORD) {
+      set({ userRole: 'limited' });
+      return true;
+    }
+    return false;
   },
 
-  logout: () => set({ isAuthenticated: false }),
+  logout: () => set({ userRole: false }),
 
   // DB sync — Supabase is source of truth, localStorage is fallback
   loadFromDb: async () => {

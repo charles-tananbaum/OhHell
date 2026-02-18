@@ -14,6 +14,8 @@ export default function Scoreboard({ game }: ScoreboardProps) {
     (a, b) => (cumulative[b] || 0) - (cumulative[a] || 0),
   );
 
+  const currentRound = game.rounds[game.currentRoundIndex];
+  const dealerId = currentRound?.dealerPlayerId;
   const maxScore = Math.max(...Object.values(cumulative), 1);
 
   return (
@@ -35,8 +37,11 @@ export default function Scoreboard({ game }: ScoreboardProps) {
               <span className="w-4 text-right text-xs font-bold text-text-secondary">
                 {i + 1}
               </span>
-              <span className="w-20 truncate text-sm font-medium">
+              <span className="flex w-24 items-center gap-1 truncate text-sm font-medium">
                 {player?.name}
+                {id === dealerId && (
+                  <span className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gold/20 text-[10px] font-bold text-gold">D</span>
+                )}
               </span>
               <div className="flex-1">
                 <motion.div

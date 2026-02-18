@@ -51,6 +51,5 @@ export interface Round {
 export interface AppState {
   players: Player[];
   games: Game[];
-  passwordHash: string | null;
-  isAuthenticated: boolean;
+  userRole: 'admin' | 'limited' | false;
 }

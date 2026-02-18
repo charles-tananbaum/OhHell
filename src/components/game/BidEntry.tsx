@@ -61,8 +61,11 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
               animate={{ opacity: 1, x: 0 }}
               className="mb-1 flex items-center justify-between rounded-lg bg-surface px-3 py-1.5"
             >
-              <span className="text-sm text-text-secondary">
+              <span className="flex items-center gap-1.5 text-sm text-text-secondary">
                 {player?.name}
+                {id === round.dealerPlayerId && (
+                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gold/20 text-[10px] font-bold text-gold">D</span>
+                )}
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold">{round.bids[id]}</span>
@@ -87,8 +90,11 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
           animate={{ opacity: 1, y: 0 }}
           className="mt-3"
         >
-          <p className="mb-2 text-center text-sm font-medium">
+          <p className="mb-2 flex items-center justify-center gap-1.5 text-sm font-medium">
             {currentPlayer?.name}'s bid
+            {currentBidderId === round.dealerPlayerId && (
+              <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gold/20 text-[10px] font-bold text-gold">D</span>
+            )}
           </p>
           {restrictedBid !== null && (
             <p className="mb-2 text-center text-xs text-red">

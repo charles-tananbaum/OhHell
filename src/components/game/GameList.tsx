@@ -15,7 +15,7 @@ import EmptyState from '../shared/EmptyState';
 import ConfirmDialog from '../shared/ConfirmDialog';
 
 export default function GameList() {
-  const { games, players, deleteGame, exportData, importData, addToast } =
+  const { games, players, deleteGame, exportData, importData, addToast, userRole } =
     useStore();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
@@ -164,15 +164,17 @@ export default function GameList() {
                           : 'Completed'}
                       </p>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteId(game.id);
-                      }}
-                      className="rounded-lg p-1.5 text-text-secondary opacity-0 transition-opacity hover:bg-surface hover:text-red group-hover:opacity-100"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {userRole === 'admin' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteId(game.id);
+                        }}
+                        className="rounded-lg p-1.5 text-text-secondary opacity-0 transition-opacity hover:bg-surface hover:text-red group-hover:opacity-100"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </motion.div>

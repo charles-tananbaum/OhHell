@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(open:*)",
+      "Bash(textutil:*)",
+      "Bash(wc:*)",
+      "Bash(npm create vite:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(curl:*)",
+      "Bash(npx vite:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(brew list:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(node -e \"\nconst { createClient } = require\\(''@supabase/supabase-js''\\);\nconst supabase = createClient\\(\n  ''https://jnikgtogqsfpbgmjcvtn.supabase.co'',\n  ''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuaWtndG9ncXNmcGJnbWpjdnRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzODM0MjEsImV4cCI6MjA4Njk1OTQyMX0.Xp0k8yrz4zvDF-G93USvEIwEWHehVlinDdUSHXQHtEU''\n\\);\n\nasync function test\\(\\) {\n  // Test upsert\n  const { data, error } = await supabase\n    .from\\(''players''\\)\n    .upsert\\({\n      id: ''p_test_js'',\n      name: ''JS Test'',\n      elo: 1000,\n      elo_history: [],\n      stats: { gamesPlayed: 0, gamesWon: 0, totalRoundsPlayed: 0, totalBidsCorrect: 0, totalBidsSum: 0, totalPlacement: 0 }\n    }, { onConflict: ''id'' }\\);\n  \n  console.log\\(''error:'', JSON.stringify\\(error\\)\\);\n  console.log\\(''data:'', JSON.stringify\\(data\\)\\);\n  \n  // Check if it''s there\n  const { data: rows, error: readErr } = await supabase.from\\(''players''\\).select\\(''*''\\);\n  console.log\\(''readErr:'', JSON.stringify\\(readErr\\)\\);\n  console.log\\(''rows:'', JSON.stringify\\(rows\\)\\);\n}\n\ntest\\(\\);\n\")",
+      "Bash(xxd:*)"
+    ]
+  }
+}

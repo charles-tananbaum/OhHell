@@ -8,7 +8,7 @@ import EmptyState from '../shared/EmptyState';
 import ConfirmDialog from '../shared/ConfirmDialog';
 
 export default function PlayerList() {
-  const { players, deletePlayer, addToast } = useStore();
+  const { players, deletePlayer, addToast, userRole } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -74,16 +74,18 @@ export default function PlayerList() {
                     >
                       <Pencil size={14} />
                     </button>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setDeleteId(player.id);
-                      }}
-                      className="rounded-lg p-1.5 text-text-secondary opacity-0 hover:bg-surface hover:text-red group-hover:opacity-100"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {userRole === 'admin' && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setDeleteId(player.id);
+                        }}
+                        className="rounded-lg p-1.5 text-text-secondary opacity-0 hover:bg-surface hover:text-red group-hover:opacity-100"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                     <ChevronRight
                       size={16}
                       className="ml-1 text-text-secondary"

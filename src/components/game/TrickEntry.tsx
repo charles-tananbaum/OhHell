@@ -62,9 +62,12 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center justify-between rounded-xl bg-surface px-3 py-2"
             >
-              <div>
+              <div className="flex items-center gap-1.5">
                 <span className="text-sm font-medium">{player?.name}</span>
-                <span className="ml-2 text-xs text-text-secondary">
+                {id === round.dealerPlayerId && (
+                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gold/20 text-[10px] font-bold text-gold">D</span>
+                )}
+                <span className="text-xs text-text-secondary">
                   bid {bid}
                 </span>
               </div>
