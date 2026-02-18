@@ -21,7 +21,6 @@ import {
   deletePlayerDb,
   deleteGameDb,
 } from '../lib/db';
-import { isSupabaseConfigured } from '../lib/supabase';
 
 interface Toast {
   id: string;
@@ -101,13 +100,23 @@ function loadFromLocal(): { players: Player[]; games: Game[] } {
   }
 }
 
-// --- Supabase sync helpers ---
-function syncGame(game: Game) {
-  upsertGame(game).catch((e) => console.error('sync game error', e));
+// --- Supabase sync helpers (awaited, with toast on failure) ---
+async function syncGame(game: Game, toast?: (msg: string, type: 'success' | 'error') => void) {
+  try {
+    await upsertGame(game);
+  } catch (e) {
+    console.error('sync game error', e);
+    toast?.('Failed to sync game to database', 'error');
+  }
 }
 
-function syncPlayer(player: Player) {
-  upsertPlayer(player).catch((e) => console.error('sync player error', e));
+async function syncPlayer(player: Player, toast?: (msg: string, type: 'success' | 'error') => void) {
+  try {
+    await upsertPlayer(player);
+  } catch (e) {
+    console.error('sync player error', e);
+    toast?.('Failed to sync player to database', 'error');
+  }
 }
 
 export const useStore = create<StoreState>()((set, get) => ({
@@ -128,13 +137,6 @@ export const useStore = create<StoreState>()((set, get) => ({
 
   // DB sync — Supabase is source of truth, localStorage is fallback
   loadFromDb: async () => {
-    if (!isSupabaseConfigured()) {
-      // No Supabase — use localStorage as primary
-      const local = loadFromLocal();
-      set({ players: local.players, games: local.games, dbReady: true });
-      return;
-    }
-
     try {
       const [dbPlayers, dbGames] = await Promise.all([
         fetchPlayers(),
@@ -188,7 +190,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       saveToLocal(players, state.games);
       return { players };
     });
-    syncPlayer(player);
+    syncPlayer(player, get().addToast);
   },
 
   updatePlayer: (id: string, name: string) => {
@@ -200,7 +202,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       return { players };
     });
     const updated = get().players.find((p) => p.id === id);
-    if (updated) syncPlayer(updated);
+    if (updated) syncPlayer(updated, get().addToast);
   },
 
   deletePlayer: (id: string) => {
@@ -258,7 +260,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       saveToLocal(state.players, games);
       return { games };
     });
-    syncGame(game);
+    syncGame(game, get().addToast);
     return id;
   },
 
@@ -294,7 +296,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       return { games };
     });
     const game = get().games.find((g) => g.id === gameId);
-    if (game) syncGame(game);
+    if (game) syncGame(game, get().addToast);
   },
 
   reviseBid: (gameId: string, playerId: string) => {
@@ -325,7 +327,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       return { games };
     });
     const game = get().games.find((g) => g.id === gameId);
-    if (game) syncGame(game);
+    if (game) syncGame(game, get().addToast);
   },
 
   submitTricks: (gameId: string, tricks: Record<string, number>) => {
@@ -350,7 +352,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       return { games };
     });
     const game = get().games.find((g) => g.id === gameId);
-    if (game) syncGame(game);
+    if (game) syncGame(game, get().addToast);
   },
 
   advanceRound: (gameId: string) => {
@@ -392,7 +394,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       return { games };
     });
     const game = get().games.find((g) => g.id === gameId);
-    if (game) syncGame(game);
+    if (game) syncGame(game, get().addToast);
   },
 
   completeGame: (gameId: string) => {
@@ -453,10 +455,11 @@ export const useStore = create<StoreState>()((set, get) => ({
     saveToLocal(updatedPlayers, updatedGames);
 
     // Sync all affected data to Supabase
+    const toast = get().addToast;
     const completedGame = updatedGames.find((g) => g.id === gameId);
-    if (completedGame) syncGame(completedGame);
+    if (completedGame) syncGame(completedGame, toast);
     for (const p of updatedPlayers) {
-      if (game.playerIds.includes(p.id)) syncPlayer(p);
+      if (game.playerIds.includes(p.id)) syncPlayer(p, toast);
     }
   },
 
@@ -476,8 +479,9 @@ export const useStore = create<StoreState>()((set, get) => ({
       if (!data.players || !data.games) return false;
       set({ players: data.players, games: data.games });
       saveToLocal(data.players, data.games);
-      for (const p of data.players) syncPlayer(p);
-      for (const g of data.games) syncGame(g);
+      const toast = get().addToast;
+      for (const p of data.players) syncPlayer(p, toast);
+      for (const g of data.games) syncGame(g, toast);
       return true;
     } catch {
       return false;

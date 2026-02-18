@@ -1,11 +1,10 @@
-import { supabase, isSupabaseConfigured } from './supabase';
+import { supabase } from './supabase';
 import type { Player, Game } from '../types';
 
 // ---- Players ----
 
 export async function fetchPlayers(): Promise<Player[]> {
-  if (!isSupabaseConfigured()) return [];
-  const { data, error } = await supabase!.from('players').select('*');
+  const { data, error } = await supabase.from('players').select('*');
   if (error) {
     console.error('fetchPlayers error:', error);
     return [];
@@ -14,22 +13,24 @@ export async function fetchPlayers(): Promise<Player[]> {
 }
 
 export async function upsertPlayer(player: Player): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-  const { error } = await supabase!.from('players').upsert(playerToRow(player));
-  if (error) console.error('upsertPlayer error:', error);
+  const row = playerToRow(player);
+  const { error } = await supabase
+    .from('players')
+    .upsert(row, { onConflict: 'id' });
+  if (error) {
+    console.error('upsertPlayer error:', error, 'row:', row);
+  }
 }
 
 export async function deletePlayerDb(id: string): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-  const { error } = await supabase!.from('players').delete().eq('id', id);
+  const { error } = await supabase.from('players').delete().eq('id', id);
   if (error) console.error('deletePlayer error:', error);
 }
 
 // ---- Games ----
 
 export async function fetchGames(): Promise<Game[]> {
-  if (!isSupabaseConfigured()) return [];
-  const { data, error } = await supabase!.from('games').select('*');
+  const { data, error } = await supabase.from('games').select('*');
   if (error) {
     console.error('fetchGames error:', error);
     return [];
@@ -38,27 +39,29 @@ export async function fetchGames(): Promise<Game[]> {
 }
 
 export async function upsertGame(game: Game): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-  const { error } = await supabase!.from('games').upsert(gameToRow(game));
-  if (error) console.error('upsertGame error:', error);
+  const row = gameToRow(game);
+  const { error } = await supabase
+    .from('games')
+    .upsert(row, { onConflict: 'id' });
+  if (error) {
+    console.error('upsertGame error:', error, 'row:', row);
+  }
 }
 
 export async function deleteGameDb(id: string): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-  const { error } = await supabase!.from('games').delete().eq('id', id);
+  const { error } = await supabase.from('games').delete().eq('id', id);
   if (error) console.error('deleteGame error:', error);
 }
 
 // ---- Row <-> Model mapping ----
-// Supabase stores JSON columns for complex fields.
 
 function playerToRow(p: Player) {
   return {
     id: p.id,
     name: p.name,
     elo: p.elo,
-    elo_history: p.eloHistory,
-    stats: p.stats,
+    elo_history: p.eloHistory as unknown,
+    stats: p.stats as unknown,
   };
 }
 
@@ -84,14 +87,14 @@ function gameToRow(g: Game) {
     id: g.id,
     status: g.status,
     date: g.date,
-    player_ids: g.playerIds,
+    player_ids: g.playerIds as unknown,
     max_cards: g.maxCards,
-    round_sequence: g.roundSequence,
+    round_sequence: g.roundSequence as unknown,
     current_round_index: g.currentRoundIndex,
     initial_dealer_index: g.initialDealerIndex,
-    rounds: g.rounds,
-    final_scores: g.finalScores,
-    elo_changes: g.eloChanges,
+    rounds: g.rounds as unknown,
+    final_scores: g.finalScores as unknown,
+    elo_changes: g.eloChanges as unknown,
   };
 }
 
