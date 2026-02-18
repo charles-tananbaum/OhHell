@@ -104,18 +104,20 @@ function loadFromLocal(): { players: Player[]; games: Game[] } {
 async function syncGame(game: Game, toast?: (msg: string, type: 'success' | 'error') => void) {
   try {
     await upsertGame(game);
-  } catch (e) {
-    console.error('sync game error', e);
-    toast?.('Failed to sync game to database', 'error');
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('sync game error', msg);
+    toast?.(`DB error: ${msg}`, 'error');
   }
 }
 
 async function syncPlayer(player: Player, toast?: (msg: string, type: 'success' | 'error') => void) {
   try {
     await upsertPlayer(player);
-  } catch (e) {
-    console.error('sync player error', e);
-    toast?.('Failed to sync player to database', 'error');
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('sync player error', msg);
+    toast?.(`DB error: ${msg}`, 'error');
   }
 }
 
