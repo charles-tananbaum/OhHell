@@ -1,0 +1,457 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { Player, Game, Round } from '../types';
+import { DEFAULT_ELO, SITE_PASSWORD, STORE_NAME } from '../constants';
+import { generatePlayerId, generateGameId } from '../lib/ids';
+import {
+  generateRoundSequence,
+  getDealerIndex,
+  getBidOrder,
+} from '../lib/gameLogic';
+import { calculateScore, calculateCumulativeScores } from '../lib/scoring';
+import { calculateEloChanges } from '../lib/elo';
+import {
+  updatePlayerStatsAfterGame,
+  getPlacementsFromScores,
+} from '../lib/stats';
+import {
+  fetchPlayers,
+  fetchGames,
+  upsertPlayer,
+  upsertGame,
+  deletePlayerDb,
+  deleteGameDb,
+} from '../lib/db';
+import { isSupabaseConfigured } from '../lib/supabase';
+
+interface Toast {
+  id: string;
+  message: string;
+  type: 'success' | 'error';
+}
+
+interface StoreState {
+  players: Player[];
+  games: Game[];
+  isAuthenticated: boolean;
+  toasts: Toast[];
+  dbReady: boolean;
+
+  // Auth
+  login: (password: string) => boolean;
+  logout: () => void;
+
+  // DB sync
+  loadFromDb: () => Promise<void>;
+
+  // Toasts
+  addToast: (message: string, type?: 'success' | 'error') => void;
+  removeToast: (id: string) => void;
+
+  // Players
+  addPlayer: (name: string) => void;
+  updatePlayer: (id: string, name: string) => void;
+  deletePlayer: (id: string) => void;
+  getPlayer: (id: string) => Player | undefined;
+
+  // Games
+  createGame: (
+    playerIds: string[],
+    maxCards: number,
+    initialDealerIndex: number,
+  ) => string;
+  getGame: (id: string) => Game | undefined;
+  deleteGame: (id: string) => void;
+  submitBid: (gameId: string, playerId: string, bid: number) => void;
+  reviseBid: (gameId: string, playerId: string) => void;
+  submitTricks: (
+    gameId: string,
+    tricks: Record<string, number>,
+  ) => void;
+  advanceRound: (gameId: string) => void;
+  completeGame: (gameId: string) => void;
+
+  // Export/Import
+  exportData: () => string;
+  importData: (json: string) => boolean;
+}
+
+// Helper to sync a game to Supabase in the background
+function syncGame(game: Game) {
+  upsertGame(game).catch((e) => console.error('sync game error', e));
+}
+
+function syncPlayer(player: Player) {
+  upsertPlayer(player).catch((e) => console.error('sync player error', e));
+}
+
+export const useStore = create<StoreState>()(
+  persist(
+    (set, get) => ({
+      players: [],
+      games: [],
+      isAuthenticated: false,
+      toasts: [],
+      dbReady: false,
+
+      // Auth — universal password
+      login: (password: string) => {
+        const valid = password === SITE_PASSWORD;
+        if (valid) set({ isAuthenticated: true });
+        return valid;
+      },
+
+      logout: () => set({ isAuthenticated: false }),
+
+      // DB sync
+      loadFromDb: async () => {
+        if (!isSupabaseConfigured()) {
+          set({ dbReady: true });
+          return;
+        }
+        try {
+          const [dbPlayers, dbGames] = await Promise.all([
+            fetchPlayers(),
+            fetchGames(),
+          ]);
+          if (dbPlayers.length > 0 || dbGames.length > 0) {
+            set({ players: dbPlayers, games: dbGames, dbReady: true });
+          } else {
+            set({ dbReady: true });
+          }
+        } catch (e) {
+          console.error('loadFromDb error:', e);
+          set({ dbReady: true });
+        }
+      },
+
+      // Toasts
+      addToast: (message: string, type: 'success' | 'error' = 'success') => {
+        const id = Date.now().toString();
+        set((state) => ({
+          toasts: [...state.toasts, { id, message, type }],
+        }));
+        setTimeout(() => get().removeToast(id), 3000);
+      },
+
+      removeToast: (id: string) => {
+        set((state) => ({
+          toasts: state.toasts.filter((t) => t.id !== id),
+        }));
+      },
+
+      // Players
+      addPlayer: (name: string) => {
+        const player: Player = {
+          id: generatePlayerId(),
+          name: name.trim(),
+          elo: DEFAULT_ELO,
+          eloHistory: [],
+          stats: {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            totalRoundsPlayed: 0,
+            totalBidsCorrect: 0,
+            totalBidsSum: 0,
+            totalPlacement: 0,
+          },
+        };
+        set((state) => ({ players: [...state.players, player] }));
+        syncPlayer(player);
+      },
+
+      updatePlayer: (id: string, name: string) => {
+        set((state) => ({
+          players: state.players.map((p) =>
+            p.id === id ? { ...p, name: name.trim() } : p,
+          ),
+        }));
+        const updated = get().players.find((p) => p.id === id);
+        if (updated) syncPlayer(updated);
+      },
+
+      deletePlayer: (id: string) => {
+        set((state) => ({
+          players: state.players.filter((p) => p.id !== id),
+        }));
+        deletePlayerDb(id);
+      },
+
+      getPlayer: (id: string) => {
+        return get().players.find((p) => p.id === id);
+      },
+
+      // Games
+      createGame: (
+        playerIds: string[],
+        maxCards: number,
+        initialDealerIndex: number,
+      ) => {
+        const id = generateGameId();
+        const roundSequence = generateRoundSequence(maxCards);
+        const dealerIdx = getDealerIndex(0, initialDealerIndex, playerIds.length);
+        const bidOrder = getBidOrder(playerIds, dealerIdx);
+
+        const firstRound: Round = {
+          roundNumber: 1,
+          cardsDealt: roundSequence[0],
+          dealerPlayerId: playerIds[dealerIdx],
+          firstBidderId: bidOrder[0],
+          bidOrder,
+          bids: {},
+          tricksTaken: {},
+          scores: {},
+          status: 'bidding',
+        };
+
+        const game: Game = {
+          id,
+          status: 'active',
+          date: new Date().toISOString(),
+          playerIds,
+          maxCards,
+          roundSequence,
+          currentRoundIndex: 0,
+          initialDealerIndex,
+          rounds: [firstRound],
+          finalScores: null,
+          eloChanges: null,
+        };
+
+        set((state) => ({ games: [...state.games, game] }));
+        syncGame(game);
+        return id;
+      },
+
+      getGame: (id: string) => {
+        return get().games.find((g) => g.id === id);
+      },
+
+      deleteGame: (id: string) => {
+        set((state) => ({
+          games: state.games.filter((g) => g.id !== id),
+        }));
+        deleteGameDb(id);
+      },
+
+      submitBid: (gameId: string, playerId: string, bid: number) => {
+        set((state) => ({
+          games: state.games.map((game) => {
+            if (game.id !== gameId) return game;
+            const rounds = [...game.rounds];
+            const current = { ...rounds[game.currentRoundIndex] };
+            current.bids = { ...current.bids, [playerId]: bid };
+
+            // If all bids are in, transition to playing
+            if (Object.keys(current.bids).length === game.playerIds.length) {
+              current.status = 'playing';
+            }
+
+            rounds[game.currentRoundIndex] = current;
+            return { ...game, rounds };
+          }),
+        }));
+        const game = get().games.find((g) => g.id === gameId);
+        if (game) syncGame(game);
+      },
+
+      reviseBid: (gameId: string, playerId: string) => {
+        set((state) => ({
+          games: state.games.map((game) => {
+            if (game.id !== gameId) return game;
+            const rounds = [...game.rounds];
+            const current = { ...rounds[game.currentRoundIndex] };
+
+            // Remove this player's bid and all subsequent bids
+            const playerIdx = current.bidOrder.indexOf(playerId);
+            if (playerIdx < 0) return game;
+
+            const newBids: Record<string, number> = {};
+            for (let i = 0; i < playerIdx; i++) {
+              const id = current.bidOrder[i];
+              if (id in current.bids) newBids[id] = current.bids[id];
+            }
+            current.bids = newBids;
+
+            // If we were in 'playing' phase, go back to bidding
+            if (current.status === 'playing') {
+              current.status = 'bidding';
+            }
+
+            rounds[game.currentRoundIndex] = current;
+            return { ...game, rounds };
+          }),
+        }));
+        const game = get().games.find((g) => g.id === gameId);
+        if (game) syncGame(game);
+      },
+
+      submitTricks: (gameId: string, tricks: Record<string, number>) => {
+        set((state) => ({
+          games: state.games.map((game) => {
+            if (game.id !== gameId) return game;
+            const rounds = [...game.rounds];
+            const current = { ...rounds[game.currentRoundIndex] };
+            current.tricksTaken = tricks;
+
+            // Calculate scores
+            const scores: Record<string, number> = {};
+            for (const id of game.playerIds) {
+              scores[id] = calculateScore(current.bids[id], tricks[id]);
+            }
+            current.scores = scores;
+            current.status = 'complete';
+
+            rounds[game.currentRoundIndex] = current;
+            return { ...game, rounds };
+          }),
+        }));
+        const game = get().games.find((g) => g.id === gameId);
+        if (game) syncGame(game);
+      },
+
+      advanceRound: (gameId: string) => {
+        set((state) => ({
+          games: state.games.map((game) => {
+            if (game.id !== gameId) return game;
+            const nextIndex = game.currentRoundIndex + 1;
+
+            if (nextIndex >= game.roundSequence.length) {
+              return game; // No more rounds
+            }
+
+            const dealerIdx = getDealerIndex(
+              nextIndex,
+              game.initialDealerIndex,
+              game.playerIds.length,
+            );
+            const bidOrder = getBidOrder(game.playerIds, dealerIdx);
+
+            const nextRound: Round = {
+              roundNumber: nextIndex + 1,
+              cardsDealt: game.roundSequence[nextIndex],
+              dealerPlayerId: game.playerIds[dealerIdx],
+              firstBidderId: bidOrder[0],
+              bidOrder,
+              bids: {},
+              tricksTaken: {},
+              scores: {},
+              status: 'bidding',
+            };
+
+            return {
+              ...game,
+              currentRoundIndex: nextIndex,
+              rounds: [...game.rounds, nextRound],
+            };
+          }),
+        }));
+        const game = get().games.find((g) => g.id === gameId);
+        if (game) syncGame(game);
+      },
+
+      completeGame: (gameId: string) => {
+        const state = get();
+        const game = state.games.find((g) => g.id === gameId);
+        if (!game) return;
+
+        const finalScores = calculateCumulativeScores(
+          game.rounds,
+          game.playerIds,
+        );
+        const placements = getPlacementsFromScores(finalScores);
+
+        // Determine winner(s)
+        const minPlacement = Math.min(...Object.values(placements));
+
+        // Calculate ELO changes
+        const eloPlayers = game.playerIds.map((id) => {
+          const p = state.players.find((pl) => pl.id === id)!;
+          return { id: p.id, elo: p.elo };
+        });
+        const eloChanges = calculateEloChanges(eloPlayers, finalScores);
+
+        // Update players
+        const updatedPlayers = state.players.map((player) => {
+          if (!game.playerIds.includes(player.id)) return player;
+
+          const placement = placements[player.id];
+          const isWinner = placement === minPlacement;
+          const updated = updatePlayerStatsAfterGame(
+            player,
+            game,
+            placement,
+            isWinner,
+          );
+
+          const eloBefore = player.elo;
+          const eloAfter = player.elo + (eloChanges[player.id] || 0);
+
+          return {
+            ...updated,
+            elo: eloAfter,
+            eloHistory: [
+              ...player.eloHistory,
+              {
+                gameId: game.id,
+                date: new Date().toISOString(),
+                eloBefore,
+                eloAfter,
+              },
+            ],
+          };
+        });
+
+        // Update game
+        const updatedGames = state.games.map((g) =>
+          g.id === gameId
+            ? { ...g, status: 'completed' as const, finalScores, eloChanges }
+            : g,
+        );
+
+        set({ players: updatedPlayers, games: updatedGames });
+
+        // Sync all affected players + game to Supabase
+        const completedGame = updatedGames.find((g) => g.id === gameId);
+        if (completedGame) syncGame(completedGame);
+        for (const p of updatedPlayers) {
+          if (game.playerIds.includes(p.id)) syncPlayer(p);
+        }
+      },
+
+      // Export/Import
+      exportData: () => {
+        const { players, games } = get();
+        return JSON.stringify(
+          { players, games, exportDate: new Date().toISOString() },
+          null,
+          2,
+        );
+      },
+
+      importData: (json: string) => {
+        try {
+          const data = JSON.parse(json);
+          if (!data.players || !data.games) return false;
+          set({
+            players: data.players,
+            games: data.games,
+          });
+          // Sync all imported data to Supabase
+          for (const p of data.players) syncPlayer(p);
+          for (const g of data.games) syncGame(g);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    }),
+    {
+      name: STORE_NAME,
+      partialize: (state) => ({
+        players: state.players,
+        games: state.games,
+      }),
+    },
+  ),
+);
