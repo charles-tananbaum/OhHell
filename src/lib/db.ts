@@ -7,24 +7,30 @@ export async function fetchPlayers(): Promise<Player[]> {
   const { data, error } = await supabase.from('players').select('*');
   if (error) {
     console.error('fetchPlayers error:', error);
-    return [];
+    throw new Error(`fetchPlayers: ${error.message}`);
   }
   return (data ?? []).map(rowToPlayer);
 }
 
 export async function upsertPlayer(player: Player): Promise<void> {
   const row = playerToRow(player);
+  console.log('DB upsertPlayer:', row.id, row.name);
   const { error } = await supabase
     .from('players')
     .upsert(row, { onConflict: 'id' });
   if (error) {
     console.error('upsertPlayer error:', error, 'row:', row);
+    throw new Error(`upsertPlayer: ${error.message}`);
   }
+  console.log('DB upsertPlayer success:', row.id);
 }
 
 export async function deletePlayerDb(id: string): Promise<void> {
   const { error } = await supabase.from('players').delete().eq('id', id);
-  if (error) console.error('deletePlayer error:', error);
+  if (error) {
+    console.error('deletePlayer error:', error);
+    throw new Error(`deletePlayer: ${error.message}`);
+  }
 }
 
 // ---- Games ----
@@ -33,24 +39,30 @@ export async function fetchGames(): Promise<Game[]> {
   const { data, error } = await supabase.from('games').select('*');
   if (error) {
     console.error('fetchGames error:', error);
-    return [];
+    throw new Error(`fetchGames: ${error.message}`);
   }
   return (data ?? []).map(rowToGame);
 }
 
 export async function upsertGame(game: Game): Promise<void> {
   const row = gameToRow(game);
+  console.log('DB upsertGame:', row.id, row.status);
   const { error } = await supabase
     .from('games')
     .upsert(row, { onConflict: 'id' });
   if (error) {
     console.error('upsertGame error:', error, 'row:', row);
+    throw new Error(`upsertGame: ${error.message}`);
   }
+  console.log('DB upsertGame success:', row.id);
 }
 
 export async function deleteGameDb(id: string): Promise<void> {
   const { error } = await supabase.from('games').delete().eq('id', id);
-  if (error) console.error('deleteGame error:', error);
+  if (error) {
+    console.error('deleteGame error:', error);
+    throw new Error(`deleteGame: ${error.message}`);
+  }
 }
 
 // ---- Row <-> Model mapping ----
