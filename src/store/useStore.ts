@@ -8,7 +8,7 @@ import {
   getBidOrder,
 } from '../lib/gameLogic';
 import { calculateScore, calculateCumulativeScores } from '../lib/scoring';
-import { calculateEloChanges } from '../lib/elo';
+import { calculateEloChanges, calculatePerformanceScores } from '../lib/elo';
 import {
   updatePlayerStatsAfterGame,
   getPlacementsFromScores,
@@ -419,11 +419,18 @@ export const useStore = create<StoreState>()((set, get) => ({
     const placements = getPlacementsFromScores(finalScores);
     const minPlacement = Math.min(...Object.values(placements));
 
+    const completedRounds = game.rounds.filter((r) => r.status === 'complete');
+    const performanceScores = calculatePerformanceScores(
+      game.playerIds,
+      completedRounds,
+      placements,
+    );
+
     const eloPlayers = game.playerIds.map((id) => {
       const p = state.players.find((pl) => pl.id === id)!;
       return { id: p.id, elo: p.elo };
     });
-    const eloChanges = calculateEloChanges(eloPlayers, finalScores);
+    const eloChanges = calculateEloChanges(eloPlayers, performanceScores);
 
     const updatedPlayers = state.players.map((player) => {
       if (!game.playerIds.includes(player.id)) return player;
