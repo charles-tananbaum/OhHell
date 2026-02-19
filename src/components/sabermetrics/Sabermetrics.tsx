@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
+import { BarChart3, ChevronUp, ChevronDown, RefreshCw } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useStore } from '../../store/useStore';
 import EmptyState from '../shared/EmptyState';
@@ -93,6 +93,8 @@ function formatValue(player: Player, key: SortKey): string {
 
 export default function Sabermetrics() {
   const players = useStore((s) => s.players);
+  const userRole = useStore((s) => s.userRole);
+  const recalculateAllElo = useStore((s) => s.recalculateAllElo);
   const [sortKey, setSortKey] = useState<SortKey>('elo');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
@@ -132,7 +134,18 @@ export default function Sabermetrics() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-bold">Sabermetrics</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-xl font-bold">Sabermetrics</h1>
+        {userRole === 'admin' && (
+          <button
+            onClick={recalculateAllElo}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent/20"
+          >
+            <RefreshCw size={14} />
+            Recalculate ELO
+          </button>
+        )}
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

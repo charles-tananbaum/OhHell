@@ -71,6 +71,9 @@ interface StoreState {
   advanceRound: (gameId: string) => void;
   completeGame: (gameId: string) => void;
 
+  // ELO recalculation
+  recalculateAllElo: () => void;
+
   // Export/Import
   exportData: () => string;
   importData: (json: string) => boolean;
@@ -478,6 +481,65 @@ export const useStore = create<StoreState>()((set, get) => ({
     for (const p of updatedPlayers) {
       if (game.playerIds.includes(p.id)) syncPlayer(p, toast);
     }
+  },
+
+  // Recalculate all ELO from scratch using completed game data
+  recalculateAllElo: () => {
+    const state = get();
+    const completedGames = state.games
+      .filter((g) => g.status === 'completed')
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    // Reset all players to starting ELO and clear history
+    const playerMap: Record<string, Player> = {};
+    for (const p of state.players) {
+      playerMap[p.id] = { ...p, elo: DEFAULT_ELO, eloHistory: [] };
+    }
+
+    // Replay every completed game chronologically
+    for (const game of completedGames) {
+      const gamePlayers = game.playerIds.filter((id) => playerMap[id]);
+      if (gamePlayers.length < 2) continue;
+
+      const finalScores = calculateCumulativeScores(game.rounds, gamePlayers);
+      const placements = getPlacementsFromScores(finalScores);
+      const completedRounds = game.rounds.filter((r) => r.status === 'complete');
+      const performanceScores = calculatePerformanceScores(
+        gamePlayers,
+        completedRounds,
+        placements,
+      );
+
+      const eloPlayers = gamePlayers.map((id) => ({
+        id,
+        elo: playerMap[id].elo,
+      }));
+      const eloChanges = calculateEloChanges(eloPlayers, performanceScores);
+
+      for (const id of gamePlayers) {
+        const eloBefore = playerMap[id].elo;
+        const eloAfter = eloBefore + (eloChanges[id] || 0);
+        playerMap[id] = {
+          ...playerMap[id],
+          elo: eloAfter,
+          eloHistory: [
+            ...playerMap[id].eloHistory,
+            { gameId: game.id, date: game.date, eloBefore, eloAfter },
+          ],
+        };
+      }
+    }
+
+    const updatedPlayers = state.players.map((p) => playerMap[p.id] || p);
+    set({ players: updatedPlayers });
+    saveToLocal(updatedPlayers, state.games);
+
+    // Sync to Supabase
+    const toast = get().addToast;
+    for (const p of updatedPlayers) {
+      syncPlayer(p, toast);
+    }
+    toast('ELO recalculated for all players', 'success');
   },
 
   // Export/Import
