@@ -10,6 +10,7 @@ import GameReview from './components/game/GameReview';
 import PlayerList from './components/players/PlayerList';
 import PlayerDetail from './components/players/PlayerDetail';
 import Leaderboard from './components/leaderboard/Leaderboard';
+import Sabermetrics from './components/sabermetrics/Sabermetrics';
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
               <Route path="/players" element={<PlayerList />} />
               <Route path="/players/:id" element={<PlayerDetail />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/sabermetrics" element={<Sabermetrics />} />
             </Route>
           </Routes>
         </AnimatePresence>

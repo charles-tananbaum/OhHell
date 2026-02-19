@@ -1,11 +1,12 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Gamepad2, Users, Trophy } from 'lucide-react';
+import { Gamepad2, Users, Trophy, BarChart3 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const links = [
   { to: '/', icon: Gamepad2, label: 'Games' },
   { to: '/players', icon: Users, label: 'Players' },
   { to: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
+  { to: '/sabermetrics', icon: BarChart3, label: 'Stats' },
 ];
 
 export default function NavBar() {
