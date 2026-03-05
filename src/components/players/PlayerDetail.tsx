@@ -4,6 +4,7 @@ import { ChevronLeft, Trophy, Target, BarChart3 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { computeDisplayStats } from '../../lib/stats';
 import EloChart from './EloChart';
+import PlayerAnalysis from './PlayerAnalysis';
 
 export default function PlayerDetail() {
   const { id } = useParams<{ id: string }>();
@@ -67,6 +68,14 @@ export default function PlayerDetail() {
             <span className="text-lg font-bold">{stat.value}</span>
           </div>
         ))}
+      </div>
+
+      {/* Player Analysis */}
+      <div className="mb-4">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+          Scouting Report
+        </h3>
+        <PlayerAnalysis player={player} games={games} />
       </div>
 
       {/* Game history */}
