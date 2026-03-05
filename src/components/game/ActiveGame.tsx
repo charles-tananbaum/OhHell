@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, Send } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import Scoreboard from './Scoreboard';
+import GameNarratives from './GameNarratives';
 import RoundFlow from './RoundFlow';
 import ConfirmDialog from '../shared/ConfirmDialog';
 
@@ -50,6 +51,8 @@ export default function ActiveGame() {
       </div>
 
       <Scoreboard game={game} />
+
+      <GameNarratives game={game} />
 
       {!allRoundsComplete && (
         <RoundFlow game={game} onComplete={() => {}} />
