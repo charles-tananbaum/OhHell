@@ -40,10 +40,6 @@ export function generatePlayerAnalysis(
     stats.totalRoundsPlayed > 0
       ? stats.totalBidsCorrect / stats.totalRoundsPlayed
       : 0;
-  const avgBid =
-    stats.totalRoundsPlayed > 0
-      ? stats.totalBidsSum / stats.totalRoundsPlayed
-      : 0;
   const winRate =
     stats.gamesPlayed > 0 ? stats.gamesWon / stats.gamesPlayed : 0;
   const avgPlacement =
