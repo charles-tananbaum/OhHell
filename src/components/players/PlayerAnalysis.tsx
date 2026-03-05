@@ -1,35 +1,34 @@
 import { motion } from 'framer-motion';
 import { Zap, AlertTriangle, Lightbulb } from 'lucide-react';
-import { generatePlayerAnalysis } from '../../lib/playerAnalysis';
-import type { Player, Game } from '../../types';
+import type { PlayerAnalysis as AnalysisType, PlayerAnalysisItem } from '../../types';
 
 interface PlayerAnalysisProps {
-  player: Player;
-  games: Game[];
+  analysis: AnalysisType | null;
 }
 
-const iconMap = {
-  strength: Zap,
-  weakness: AlertTriangle,
-  tip: Lightbulb,
-} as const;
+const columns = [
+  {
+    key: 'pros' as const,
+    label: 'Pros',
+    icon: Zap,
+    colors: { header: 'text-green', bg: 'bg-green/10', border: 'border-green/20' },
+  },
+  {
+    key: 'cons' as const,
+    label: 'Cons',
+    icon: AlertTriangle,
+    colors: { header: 'text-red', bg: 'bg-red/10', border: 'border-red/20' },
+  },
+  {
+    key: 'advice' as const,
+    label: 'Advice',
+    icon: Lightbulb,
+    colors: { header: 'text-gold', bg: 'bg-gold/10', border: 'border-gold/20' },
+  },
+] as const;
 
-const colorMap = {
-  strength: { bg: 'bg-green/10', text: 'text-green', border: 'border-green/20' },
-  weakness: { bg: 'bg-red/10', text: 'text-red', border: 'border-red/20' },
-  tip: { bg: 'bg-gold/10', text: 'text-gold', border: 'border-gold/20' },
-} as const;
-
-const labelMap = {
-  strength: 'Strength',
-  weakness: 'Weakness',
-  tip: 'Pro Tip',
-} as const;
-
-export default function PlayerAnalysis({ player, games }: PlayerAnalysisProps) {
-  const insights = generatePlayerAnalysis(player, games);
-
-  if (insights.length === 0) {
+export default function PlayerAnalysis({ analysis }: PlayerAnalysisProps) {
+  if (!analysis) {
     return (
       <div className="rounded-2xl bg-card p-4 text-center text-sm text-text-secondary">
         Not enough data yet — play some games first!
@@ -37,34 +36,63 @@ export default function PlayerAnalysis({ player, games }: PlayerAnalysisProps) {
     );
   }
 
-  return (
-    <div className="space-y-2">
-      {insights.map((insight, i) => {
-        const Icon = iconMap[insight.type];
-        const colors = colorMap[insight.type];
-        const label = labelMap[insight.type];
+  const maxRows = Math.max(
+    analysis.pros.length,
+    analysis.cons.length,
+    analysis.advice.length,
+  );
 
-        return (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className={`rounded-xl border ${colors.border} ${colors.bg} p-3`}
-          >
-            <div className="mb-1 flex items-center gap-2">
-              <Icon size={14} className={colors.text} />
-              <span className={`text-[10px] font-semibold uppercase tracking-wide ${colors.text}`}>
-                {label}
-              </span>
-            </div>
-            <p className="text-sm font-semibold">{insight.title}</p>
-            <p className="mt-0.5 text-xs text-text-secondary leading-relaxed">
-              {insight.detail}
-            </p>
-          </motion.div>
-        );
-      })}
+  return (
+    <div className="overflow-x-auto rounded-2xl bg-card">
+      <table className="w-full">
+        <thead>
+          <tr>
+            {columns.map((col) => (
+              <th
+                key={col.key}
+                className={`w-1/3 border-b border-separator px-3 py-2.5 text-left`}
+              >
+                <div className="flex items-center gap-1.5">
+                  <col.icon size={14} className={col.colors.header} />
+                  <span className={`text-xs font-semibold uppercase tracking-wide ${col.colors.header}`}>
+                    {col.label}
+                  </span>
+                </div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: maxRows }).map((_, rowIdx) => (
+            <motion.tr
+              key={rowIdx}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: rowIdx * 0.05 }}
+              className="border-b border-separator/30 last:border-b-0"
+            >
+              {columns.map((col) => {
+                const item: PlayerAnalysisItem | undefined = analysis[col.key][rowIdx];
+                return (
+                  <td
+                    key={col.key}
+                    className="w-1/3 px-3 py-2.5 align-top"
+                  >
+                    {item ? (
+                      <div>
+                        <p className="text-xs font-semibold">{item.title}</p>
+                        <p className="mt-0.5 text-[11px] leading-relaxed text-text-secondary">
+                          {item.detail}
+                        </p>
+                      </div>
+                    ) : null}
+                  </td>
+                );
+              })}
+            </motion.tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

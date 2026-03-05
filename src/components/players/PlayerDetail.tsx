@@ -75,7 +75,7 @@ export default function PlayerDetail() {
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
           Scouting Report
         </h3>
-        <PlayerAnalysis player={player} games={games} />
+        <PlayerAnalysis analysis={player.analysis} />
       </div>
 
       {/* Game history */}

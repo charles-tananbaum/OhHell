@@ -13,6 +13,7 @@ import {
   updatePlayerStatsAfterGame,
   getPlacementsFromScores,
 } from '../lib/stats';
+import { generatePlayerAnalysis } from '../lib/playerAnalysis';
 import {
   fetchPlayers,
   fetchGames,
@@ -197,6 +198,7 @@ export const useStore = create<StoreState>()((set, get) => ({
         totalBidsSum: 0,
         totalPlacement: 0,
       },
+      analysis: null,
     };
     set((state) => {
       const players = [...state.players, player];
@@ -471,14 +473,23 @@ export const useStore = create<StoreState>()((set, get) => ({
         : g,
     );
 
-    set({ players: updatedPlayers, games: updatedGames });
-    saveToLocal(updatedPlayers, updatedGames);
+    // Recalculate analysis for all players in this game
+    const playersWithAnalysis = updatedPlayers.map((player) => {
+      if (!game.playerIds.includes(player.id)) return player;
+      return {
+        ...player,
+        analysis: generatePlayerAnalysis(player, updatedGames),
+      };
+    });
+
+    set({ players: playersWithAnalysis, games: updatedGames });
+    saveToLocal(playersWithAnalysis, updatedGames);
 
     // Sync all affected data to Supabase
     const toast = get().addToast;
     const completedGame = updatedGames.find((g) => g.id === gameId);
     if (completedGame) syncGame(completedGame, toast);
-    for (const p of updatedPlayers) {
+    for (const p of playersWithAnalysis) {
       if (game.playerIds.includes(p.id)) syncPlayer(p, toast);
     }
   },
@@ -530,7 +541,14 @@ export const useStore = create<StoreState>()((set, get) => ({
       }
     }
 
-    const updatedPlayers = state.players.map((p) => playerMap[p.id] || p);
+    // Recalculate analysis for all players
+    const updatedPlayers = state.players.map((p) => {
+      const base = playerMap[p.id] || p;
+      return {
+        ...base,
+        analysis: generatePlayerAnalysis(base, state.games),
+      };
+    });
     set({ players: updatedPlayers });
     saveToLocal(updatedPlayers, state.games);
 

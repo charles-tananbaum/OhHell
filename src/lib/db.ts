@@ -74,6 +74,7 @@ function playerToRow(p: Player) {
     elo: p.elo,
     elo_history: p.eloHistory as unknown,
     stats: p.stats as unknown,
+    analysis: p.analysis as unknown,
   };
 }
 
@@ -91,6 +92,7 @@ function rowToPlayer(row: Record<string, unknown>): Player {
       totalBidsSum: 0,
       totalPlacement: 0,
     },
+    analysis: (row.analysis as Player['analysis']) ?? null,
   };
 }
 

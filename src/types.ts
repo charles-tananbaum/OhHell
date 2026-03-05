@@ -1,9 +1,21 @@
+export interface PlayerAnalysisItem {
+  title: string;
+  detail: string;
+}
+
+export interface PlayerAnalysis {
+  pros: PlayerAnalysisItem[];
+  cons: PlayerAnalysisItem[];
+  advice: PlayerAnalysisItem[];
+}
+
 export interface Player {
   id: string;
   name: string;
   elo: number;
   eloHistory: EloHistoryEntry[];
   stats: PlayerStats;
+  analysis: PlayerAnalysis | null;
 }
 
 export interface EloHistoryEntry {
