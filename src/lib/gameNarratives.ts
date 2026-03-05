@@ -37,7 +37,7 @@ export function generateGameNarratives(
   if (leaderPlayer && leaderPlayer.stats.gamesWon === 0 && progress >= 0.4) {
     narratives.push({
       emoji: '\u{1F31F}',
-      text: `Ayo ${name(leaderId)} ain't never won a game before — this could be the one. The come-up is REAL right now. BOOM BOOM BOOM.`,
+      text: `This could be ${name(leaderId)}'s first ever win!`,
       priority: 10,
     });
   }
@@ -48,7 +48,7 @@ export function generateGameNarratives(
     if (recentWins >= 2 && progress >= 0.4) {
       narratives.push({
         emoji: '\u{1F451}',
-        text: `${name(leaderId)} done won ${recentWins} straight. That's a whole dynasty cookin'. Somebody gotta stop this man before he buy the whole table. FLYGOD.`,
+        text: `${name(leaderId)} has won ${recentWins} straight — dynasty in the making?`,
         priority: 9,
       });
     }
@@ -59,7 +59,7 @@ export function generateGameNarratives(
   if (leaderLosses >= 3 && progress >= 0.3) {
     narratives.push({
       emoji: '\u{1F525}',
-      text: `${name(leaderId)} walked in here with ${leaderLosses} straight L's and now look at 'em. Revenge tour in full effect. The streets is watchin'.`,
+      text: `${name(leaderId)} came in on a ${leaderLosses}-game cold streak. Revenge arc loading...`,
       priority: 8,
     });
   }
@@ -70,7 +70,7 @@ export function generateGameNarratives(
     if (streak >= 3) {
       narratives.push({
         emoji: '\u{1F3AF}',
-        text: `${name(id)} hit ${streak} bids in a row — that boy locked in like the safe at the stash house. Don't even blink.`,
+        text: `${name(id)} has hit ${streak} bids in a row — locked in.`,
         priority: 7,
       });
     }
@@ -82,7 +82,7 @@ export function generateGameNarratives(
     if (missStreak >= 3) {
       narratives.push({
         emoji: '\u{1F9CA}',
-        text: `${name(id)} missed ${missStreak} straight bids. Cold as a Buffalo winter out here. Somebody get this man a coat.`,
+        text: `${name(id)} has missed ${missStreak} straight bids. Ice cold.`,
         priority: 6,
       });
     }
@@ -92,7 +92,7 @@ export function generateGameNarratives(
   if (sorted.length >= 2 && leaderScore - secondScore >= 20 && progress >= 0.3) {
     narratives.push({
       emoji: '\u{1F680}',
-      text: `${name(leaderId)} got a ${leaderScore - secondScore}-point lead. That ain't a game no more, that's a SERMON. AH HA HA.`,
+      text: `${name(leaderId)} is running away with it — ${leaderScore - secondScore} points clear.`,
       priority: 7,
     });
   }
@@ -101,7 +101,7 @@ export function generateGameNarratives(
   if (sorted.length >= 2 && leaderScore > 0 && leaderScore - secondScore <= 3 && progress >= 0.4) {
     narratives.push({
       emoji: '\u{26A1}',
-      text: `${name(leaderId)} and ${name(sorted[1])} only ${leaderScore - secondScore} point${leaderScore - secondScore !== 1 ? 's' : ''} apart. This a standoff in the streets right now. Somebody finna blink.`,
+      text: `${name(leaderId)} and ${name(sorted[1])} are separated by just ${leaderScore - secondScore} point${leaderScore - secondScore !== 1 ? 's' : ''}!`,
       priority: 8,
     });
   }
@@ -118,13 +118,13 @@ export function generateGameNarratives(
     if (nowIdx === 0 && wasLast !== halfSorted[0]) {
       narratives.push({
         emoji: '\u{1F4AA}',
-        text: `${name(wasLast)} was dead last at the half and now runnin' the whole thing. That's a Griselda comeback. From the mud to the penthouse. DOOT DOOT DOOT.`,
+        text: `${name(wasLast)} was in last place at the halfway mark — now leads!`,
         priority: 9,
       });
     } else if (nowIdx <= 1 && halfSorted.indexOf(wasLast) >= sorted.length - 1 && sorted.length >= 3) {
       narratives.push({
         emoji: '\u{1F4C8}',
-        text: `${name(wasLast)} climbed from the gutter to ${nowIdx === 0 ? 'the top' : 'second'}. The come-up is beautiful when you see it in person.`,
+        text: `${name(wasLast)} has climbed from last to ${nowIdx === 0 ? '1st' : '2nd'}. Comeback szn.`,
         priority: 8,
       });
     }
@@ -138,13 +138,13 @@ export function generateGameNarratives(
     if (allHits && completedRounds.length >= 3) {
       narratives.push({
         emoji: '\u{1F48E}',
-        text: `${name(id)} ain't missed a single bid yet. PERFECT GAME ALERT. This man playin' chess while y'all playin' Go Fish. FLYGOD IS AN AWESOME GOD.`,
+        text: `${name(id)} hasn't missed a single bid. Perfect game alert.`,
         priority: 10,
       });
     }
   }
 
-  // --- Upset alert ---
+  // --- Biggest upset potential (lowest ELO leading) ---
   if (progress >= 0.5) {
     const elos = game.playerIds.map((id) => ({
       id,
@@ -156,7 +156,7 @@ export function generateGameNarratives(
       if (highestElo.elo - lowestElo.elo >= 30) {
         narratives.push({
           emoji: '\u{1F3C6}',
-          text: `UPSET WATCH. ${name(leaderId)} got the lowest ELO at the table and is COOKIN' ${name(highestElo.id)}. The underdog got the strap tonight.`,
+          text: `Upset alert! ${name(leaderId)} (lowest ELO) is leading over ${name(highestElo.id)}.`,
           priority: 8,
         });
       }
@@ -165,10 +165,9 @@ export function generateGameNarratives(
 
   // --- Down to the wire ---
   if (progress >= 0.8 && sorted.length >= 2 && leaderScore - secondScore <= 10) {
-    const left = totalRounds - completedRounds.length;
     narratives.push({
       emoji: '\u{23F0}',
-      text: `${left} round${left !== 1 ? 's' : ''} left and it's still anybody's bag. The block is HOT right now. Who want it more?`,
+      text: `Final stretch — anyone's game with just ${totalRounds - completedRounds.length} round${totalRounds - completedRounds.length !== 1 ? 's' : ''} left.`,
       priority: 7,
     });
   }

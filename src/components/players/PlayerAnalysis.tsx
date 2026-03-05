@@ -31,7 +31,7 @@ export default function PlayerAnalysis({ analysis }: PlayerAnalysisProps) {
   if (!analysis) {
     return (
       <div className="rounded-2xl bg-card p-4 text-center text-sm text-text-secondary">
-        Ain't got no tape on this one yet. Go play some games first, then we'll talk.
+        Not enough data yet — play some games first!
       </div>
     );
   }
