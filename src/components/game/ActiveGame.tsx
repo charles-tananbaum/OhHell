@@ -43,12 +43,12 @@ export default function ActiveGame() {
       <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => navigate('/')}
-          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
+          className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
         >
           <ChevronLeft size={18} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Game</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Game</h1>
           <p className="text-xs text-text-secondary">
             Round {game.currentRoundIndex + 1} of {game.roundSequence.length}
           </p>
@@ -69,18 +69,18 @@ export default function ActiveGame() {
           animate={{ opacity: 1, y: 0 }}
           className="mt-4"
         >
-          <div className="rounded-2xl glass p-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl gradient-green">
+          <div className="rounded-2xl card-surface p-6 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl gradient-gold">
               <Sparkles size={24} className="text-white" />
             </div>
-            <p className="mb-1 text-base font-bold">All rounds complete!</p>
+            <p className="mb-1 font-display text-lg font-bold text-ivory">All rounds complete!</p>
             <p className="mb-5 text-sm text-text-secondary">
               Review the scoreboard above, then submit to finalize scores and
               update ELO ratings.
             </p>
             <button
               onClick={() => setShowConfirm(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl gradient-green py-3.5 font-semibold text-white transition-all active:scale-[0.98] glow-green"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl gradient-accent py-3.5 font-semibold text-white transition-all active:scale-[0.98] glow-accent"
             >
               <Send size={18} />
               Submit Game

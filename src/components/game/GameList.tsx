@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
-  Gamepad2,
+  Spade,
   Clock,
   CheckCircle,
   Download,
@@ -21,14 +21,20 @@ export default function GameList() {
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const filtered = games
-    .filter((g) => filter === 'all' || g.status === filter)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const filtered = useMemo(
+    () => games
+      .filter((g) => filter === 'all' || g.status === filter)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [games, filter],
+  );
 
-  const getPlayerNames = (ids: string[]) =>
-    ids
-      .map((id) => players.find((p) => p.id === id)?.name ?? '?')
-      .join(', ');
+  const getPlayerNames = useCallback(
+    (ids: string[]) =>
+      ids
+        .map((id) => players.find((p) => p.id === id)?.name ?? '?')
+        .join(', '),
+    [players],
+  );
 
   const handleExport = () => {
     const json = exportData();
@@ -66,7 +72,7 @@ export default function GameList() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Games</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Games</h1>
           <p className="mt-0.5 text-sm text-text-secondary">
             {games.length} total
           </p>
@@ -74,14 +80,14 @@ export default function GameList() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleImport}
-            className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
+            className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
             title="Import"
           >
             <Upload size={16} />
           </button>
           <button
             onClick={handleExport}
-            className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
+            className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
             title="Export"
           >
             <Download size={16} />
@@ -96,21 +102,21 @@ export default function GameList() {
         </div>
       </div>
 
-      <div className="mb-5 flex gap-1 rounded-2xl bg-white/[0.03] p-1 ring-1 ring-white/[0.06]">
+      <div className="mb-5 flex gap-1 rounded-2xl border border-separator bg-surface-raised/50 p-1">
         {(['all', 'active', 'completed'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             className={`relative flex-1 rounded-xl py-2 text-xs font-medium capitalize transition-colors ${
               filter === f
-                ? 'text-white'
-                : 'text-text-secondary hover:text-white'
+                ? 'text-ivory'
+                : 'text-text-secondary hover:text-ivory'
             }`}
           >
             {filter === f && (
               <motion.div
                 layoutId="game-filter"
-                className="absolute inset-0 rounded-xl bg-white/[0.08]"
+                className="absolute inset-0 rounded-xl card-surface"
                 transition={{ type: 'spring', stiffness: 500, damping: 35 }}
               />
             )}
@@ -121,7 +127,7 @@ export default function GameList() {
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon={Gamepad2}
+          icon={Spade}
           title="No games yet"
           description="Start a new game to begin tracking scores"
           action={
@@ -152,31 +158,31 @@ export default function GameList() {
                         : `/games/${game.id}/review`,
                     )
                   }
-                  className="group cursor-pointer rounded-2xl glass p-4 transition-all hover:bg-white/[0.06]"
+                  className="group cursor-pointer rounded-2xl card-surface p-4 transition-all hover:card-surface-hover"
                 >
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="mb-1.5 flex items-center gap-2">
                         {game.status === 'active' ? (
                           <div className="flex items-center gap-1.5 rounded-full bg-gold/10 px-2 py-0.5">
-                            <Clock size={12} className="text-gold" />
+                            <Clock size={11} className="text-gold" />
                             <span className="text-[10px] font-medium text-gold">
                               Active
                             </span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5 rounded-full bg-green/10 px-2 py-0.5">
-                            <CheckCircle size={12} className="text-green" />
+                            <CheckCircle size={11} className="text-green" />
                             <span className="text-[10px] font-medium text-green">
                               Complete
                             </span>
                           </div>
                         )}
-                        <span className="text-[10px] text-text-secondary">
+                        <span className="text-[10px] text-text-muted">
                           {new Date(game.date).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="truncate text-sm font-semibold">
+                      <p className="truncate text-sm font-semibold text-ivory">
                         {getPlayerNames(game.playerIds)}
                       </p>
                       <p className="mt-0.5 text-xs text-text-secondary">
@@ -191,7 +197,7 @@ export default function GameList() {
                           e.stopPropagation();
                           setDeleteId(game.id);
                         }}
-                        className="rounded-xl p-2 text-text-secondary opacity-0 transition-all hover:bg-red/10 hover:text-red group-hover:opacity-100"
+                        className="rounded-xl p-2 text-text-muted opacity-0 transition-all hover:bg-red/10 hover:text-red group-hover:opacity-100"
                       >
                         <Trash2 size={14} />
                       </button>

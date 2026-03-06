@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, ChevronUp, ChevronDown, RefreshCw } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -107,22 +107,25 @@ export default function Sabermetrics() {
     }
   };
 
-  const sorted = [...players].sort((a, b) => {
-    const aVal = getRawValue(a, sortKey);
-    const bVal = getRawValue(b, sortKey);
-    if (typeof aVal === 'string' && typeof bVal === 'string') {
-      return sortDir === 'asc'
-        ? aVal.localeCompare(bVal)
-        : bVal.localeCompare(aVal);
-    }
-    const diff = (aVal as number) - (bVal as number);
-    return sortDir === 'asc' ? diff : -diff;
-  });
+  const sorted = useMemo(
+    () => [...players].sort((a, b) => {
+      const aVal = getRawValue(a, sortKey);
+      const bVal = getRawValue(b, sortKey);
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDir === 'asc'
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
+      const diff = (aVal as number) - (bVal as number);
+      return sortDir === 'asc' ? diff : -diff;
+    }),
+    [players, sortKey, sortDir],
+  );
 
   if (players.length === 0) {
     return (
       <div>
-        <h1 className="mb-6 text-2xl font-bold tracking-tight">Sabermetrics</h1>
+        <h1 className="mb-6 font-display text-3xl font-bold tracking-tight text-ivory">Sabermetrics</h1>
         <EmptyState
           icon={BarChart3}
           title="No player data"
@@ -135,11 +138,11 @@ export default function Sabermetrics() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Sabermetrics</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Sabermetrics</h1>
         {userRole === 'admin' && (
           <button
             onClick={recalculateAllElo}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-accent/10 px-3 py-2 text-xs font-semibold text-accent-light transition-all hover:bg-accent/20"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-accent/25 px-3 py-2 text-xs font-semibold text-accent-light transition-all hover:bg-accent/10"
           >
             <RefreshCw size={14} />
             Recalculate ELO
@@ -149,18 +152,18 @@ export default function Sabermetrics() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto rounded-2xl glass"
+        className="overflow-x-auto rounded-2xl card-surface"
       >
         <table className="w-full min-w-[600px] text-sm">
           <thead>
-            <tr className="border-b border-white/[0.06]">
+            <tr className="border-b border-separator-strong">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   title={col.title}
                   onClick={() => handleSort(col.key)}
                   className={clsx(
-                    'cursor-pointer select-none whitespace-nowrap px-3 py-3.5 text-left font-medium text-text-secondary transition-colors hover:text-white',
+                    'cursor-pointer select-none whitespace-nowrap px-3 py-3.5 text-left font-medium text-text-secondary transition-colors hover:text-ivory',
                     col.key !== 'name' && 'text-right',
                     sortKey === col.key && 'text-accent-light',
                   )}
@@ -185,14 +188,14 @@ export default function Sabermetrics() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.03 }}
-                className="border-b border-white/[0.04] last:border-0 transition-colors hover:bg-white/[0.02]"
+                className="border-b border-separator last:border-0 transition-colors hover:bg-separator/30"
               >
                 {columns.map((col) => (
                   <td
                     key={col.key}
                     className={clsx(
                       'whitespace-nowrap px-3 py-3',
-                      col.key === 'name' ? 'font-semibold' : 'text-right',
+                      col.key === 'name' ? 'font-semibold text-ivory' : 'text-right text-text-secondary',
                     )}
                   >
                     {formatValue(player, col.key)}

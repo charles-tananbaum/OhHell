@@ -43,13 +43,13 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.key === 'Escape' && onClose()}
-            className="w-full max-w-md rounded-t-3xl border border-white/[0.08] bg-surface p-6 sm:rounded-3xl"
+            className="w-full max-w-md rounded-t-3xl border border-separator-strong bg-surface-raised p-6 sm:rounded-3xl"
           >
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-bold">{title}</h2>
+              <h2 className="font-display text-xl font-semibold text-ivory">{title}</h2>
               <button
                 onClick={onClose}
-                className="rounded-full p-1.5 text-text-secondary transition-colors hover:bg-white/[0.05] hover:text-white"
+                className="rounded-full p-1.5 text-text-secondary transition-colors hover:bg-separator hover:text-ivory"
               >
                 <X size={18} />
               </button>

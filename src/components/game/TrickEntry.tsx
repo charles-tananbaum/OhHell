@@ -38,16 +38,16 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
   };
 
   return (
-    <div className="rounded-2xl glass p-4">
+    <div className="rounded-2xl card-surface p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">
+        <h3 className="font-display text-base font-semibold text-ivory">
           Tricks · {round.cardsDealt} card{round.cardsDealt !== 1 ? 's' : ''}
         </h3>
         <span
           className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
             isValid
               ? 'bg-green/10 text-green'
-              : 'bg-white/[0.05] text-text-secondary'
+              : 'border border-separator text-text-secondary'
           }`}
         >
           {total} / {round.cardsDealt}
@@ -63,18 +63,18 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
               key={id}
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2.5"
+              className="flex items-center justify-between rounded-xl bg-separator/50 px-3 py-2.5"
             >
               <div className="flex items-center gap-2">
                 <Avatar name={player?.name ?? '?'} size="sm" />
                 <div>
-                  <span className="text-sm font-medium">{player?.name}</span>
+                  <span className="text-sm font-medium text-ivory">{player?.name}</span>
                   {id === round.dealerPlayerId && (
                     <span className="ml-1.5 inline-flex h-4 items-center rounded-full bg-gold/15 px-1.5 text-[9px] font-bold text-gold">
                       D
                     </span>
                   )}
-                  <span className="ml-2 text-xs text-text-secondary">
+                  <span className="ml-2 text-xs text-text-muted">
                     bid {bid}
                   </span>
                 </div>
@@ -83,17 +83,17 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
                 <button
                   onClick={() => updateTrick(id, -1)}
                   disabled={tricks[id] <= 0}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] text-white transition-all hover:bg-white/[0.1] active:scale-95 disabled:opacity-20"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-20"
                 >
                   <Minus size={14} />
                 </button>
-                <span className="flex h-9 w-9 items-center justify-center text-sm font-bold">
+                <span className="flex h-9 w-9 items-center justify-center text-sm font-bold text-ivory">
                   {tricks[id]}
                 </span>
                 <button
                   onClick={() => updateTrick(id, 1)}
                   disabled={tricks[id] >= round.cardsDealt}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] text-white transition-all hover:bg-white/[0.1] active:scale-95 disabled:opacity-20"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-20"
                 >
                   <Plus size={14} />
                 </button>
@@ -106,7 +106,7 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
       <div className="mt-4 flex gap-3">
         <button
           onClick={() => reviseBid(gameId, round.bidOrder[0])}
-          className="flex items-center justify-center gap-1.5 rounded-2xl bg-white/[0.05] px-4 py-3 text-sm font-medium text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
+          className="flex items-center justify-center gap-1.5 rounded-2xl border border-separator px-4 py-3 text-sm font-medium text-text-secondary transition-all hover:bg-separator hover:text-ivory"
         >
           <ArrowLeft size={14} />
           Revise

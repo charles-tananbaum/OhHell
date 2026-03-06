@@ -40,20 +40,20 @@ export default function PlayerDetail() {
       <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => navigate('/players')}
-          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
+          className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
         >
           <ChevronLeft size={18} />
         </button>
         <Avatar name={player.name} size="lg" />
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{player.name}</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">{player.name}</h1>
           <p className="text-xs text-text-secondary">ELO {player.elo}</p>
         </div>
       </div>
 
       {/* ELO Chart */}
       <div className="mb-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+        <h3 className="mb-2 font-display text-xs font-semibold uppercase tracking-[0.15em] text-text-secondary">
           ELO History
         </h3>
         <EloChart history={player.eloHistory} />
@@ -67,22 +67,22 @@ export default function PlayerDetail() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="rounded-2xl glass p-3.5"
+            className="rounded-2xl card-surface p-3.5"
           >
             <div className="mb-1.5 flex items-center gap-1.5">
-              <stat.icon size={12} className="text-text-secondary" />
-              <span className="text-[10px] font-medium text-text-secondary">
+              <stat.icon size={12} className="text-text-muted" />
+              <span className="text-[10px] font-medium text-text-muted">
                 {stat.label}
               </span>
             </div>
-            <span className="text-xl font-bold">{stat.value}</span>
+            <span className="font-display text-2xl font-bold text-ivory">{stat.value}</span>
           </motion.div>
         ))}
       </div>
 
       {/* Player Analysis */}
       <div className="mb-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+        <h3 className="mb-2 font-display text-xs font-semibold uppercase tracking-[0.15em] text-text-secondary">
           Scouting Report
         </h3>
         <PlayerAnalysis analysis={player.analysis} />
@@ -90,7 +90,7 @@ export default function PlayerDetail() {
 
       {/* Game history */}
       <div>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+        <h3 className="mb-2 font-display text-xs font-semibold uppercase tracking-[0.15em] text-text-secondary">
           Game History
         </h3>
         {playerGames.length === 0 ? (
@@ -105,12 +105,12 @@ export default function PlayerDetail() {
                     ? `/games/${game.id}/review`
                     : `/games/${game.id}`
                 }
-                className="flex items-center justify-between rounded-xl glass px-3 py-2.5 transition-all hover:bg-white/[0.06]"
+                className="flex items-center justify-between rounded-xl card-surface px-3 py-2.5 transition-all hover:card-surface-hover"
               >
                 <span className="text-xs text-text-secondary">
                   {new Date(game.date).toLocaleDateString()}
                 </span>
-                <span className="text-xs font-semibold">
+                <span className="text-xs font-semibold text-ivory">
                   {game.status === 'completed' && game.finalScores
                     ? `${game.finalScores[player.id]} pts`
                     : 'In progress'}

@@ -18,8 +18,8 @@ export default function RoundSummary({
   const players = useStore((s) => s.players);
 
   return (
-    <div className="rounded-2xl glass p-4">
-      <h3 className="mb-3 text-sm font-semibold">
+    <div className="rounded-2xl card-surface p-4">
+      <h3 className="mb-3 font-display text-base font-semibold text-ivory">
         Round {round.roundNumber} Summary
       </h3>
 
@@ -37,7 +37,7 @@ export default function RoundSummary({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2.5"
+              className="flex items-center justify-between rounded-xl bg-separator/50 px-3 py-2.5"
             >
               <div className="flex items-center gap-2.5">
                 <div
@@ -52,7 +52,7 @@ export default function RoundSummary({
                   )}
                 </div>
                 <Avatar name={player?.name ?? '?'} size="sm" />
-                <span className="text-sm font-medium">{player?.name}</span>
+                <span className="text-sm font-medium text-ivory">{player?.name}</span>
                 {id === round.dealerPlayerId && (
                   <span className="inline-flex h-4 items-center rounded-full bg-gold/15 px-1.5 text-[9px] font-bold text-gold">
                     D
@@ -60,7 +60,7 @@ export default function RoundSummary({
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-text-secondary">
+                <span className="text-xs text-text-muted">
                   bid {bid} · took {tricks}
                 </span>
                 <motion.span
@@ -70,7 +70,7 @@ export default function RoundSummary({
                   className={`flex h-7 min-w-[2rem] items-center justify-center rounded-lg text-sm font-bold ${
                     hit
                       ? 'bg-green/10 text-green'
-                      : 'bg-white/[0.04] text-text-secondary'
+                      : 'bg-separator text-text-secondary'
                   }`}
                 >
                   +{score}

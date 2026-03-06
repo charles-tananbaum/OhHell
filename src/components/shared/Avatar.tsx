@@ -1,55 +1,56 @@
-import { clsx } from 'clsx';
+import { memo } from 'react';
 
-const AVATAR_COLORS = [
-  'from-indigo-500 to-purple-500',
-  'from-emerald-500 to-teal-500',
-  'from-amber-500 to-orange-500',
-  'from-rose-500 to-pink-500',
-  'from-cyan-500 to-blue-500',
-  'from-violet-500 to-fuchsia-500',
-  'from-lime-500 to-green-500',
-  'from-red-500 to-rose-500',
+const PALETTES: [string, string][] = [
+  ['#2d7a4f', '#1a5c38'],
+  ['#7a5c2d', '#5c4520'],
+  ['#4a6b3e', '#354d2d'],
+  ['#6b4a3e', '#4d352d'],
+  ['#3e5a6b', '#2d424d'],
+  ['#6b3e5a', '#4d2d42'],
+  ['#5a6b3e', '#424d2d'],
+  ['#3e6b5a', '#2d4d42'],
 ];
 
-function getColorIndex(name: string): number {
+function hashName(name: string): number {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return Math.abs(hash) % AVATAR_COLORS.length;
+  return Math.abs(hash);
 }
 
-interface AvatarProps {
-  name: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  className?: string;
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
 }
 
 const sizes = {
-  sm: 'h-6 w-6 text-[10px]',
-  md: 'h-8 w-8 text-xs',
-  lg: 'h-10 w-10 text-sm',
-  xl: 'h-14 w-14 text-lg',
+  sm: 'h-7 w-7 text-[10px]',
+  md: 'h-9 w-9 text-xs',
+  lg: 'h-11 w-11 text-sm',
+  xl: 'h-16 w-16 text-lg',
 };
 
-export default function Avatar({ name, size = 'md', className }: AvatarProps) {
-  const initials = name
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+interface AvatarProps {
+  name: string;
+  size?: keyof typeof sizes;
+  className?: string;
+}
+
+export default memo(function Avatar({ name, size = 'md', className = '' }: AvatarProps) {
+  const hash = hashName(name);
+  const [c1, c2] = PALETTES[hash % PALETTES.length];
 
   return (
     <div
-      className={clsx(
-        'flex items-center justify-center rounded-full bg-gradient-to-br font-bold text-white',
-        sizes[size],
-        AVATAR_COLORS[getColorIndex(name)],
-        className,
-      )}
+      className={`${sizes[size]} flex shrink-0 items-center justify-center rounded-full font-display font-semibold tracking-wide text-ivory/90 ${className}`}
+      style={{
+        background: `linear-gradient(145deg, ${c1}, ${c2})`,
+        boxShadow: `0 2px 8px ${c1}33`,
+      }}
     >
-      {initials}
+      {getInitials(name)}
     </div>
   );
-}
+});

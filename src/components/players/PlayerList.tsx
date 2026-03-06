@@ -20,7 +20,7 @@ export default function PlayerList() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Players</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Players</h1>
           <p className="mt-0.5 text-sm text-text-secondary">
             {players.length} registered
           </p>
@@ -61,12 +61,12 @@ export default function PlayerList() {
               >
                 <Link
                   to={`/players/${player.id}`}
-                  className="group flex items-center justify-between rounded-2xl glass p-4 transition-all hover:bg-white/[0.06]"
+                  className="group flex items-center justify-between rounded-2xl card-surface p-4 transition-all hover:card-surface-hover"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar name={player.name} size="lg" />
                     <div>
-                      <p className="text-sm font-semibold">{player.name}</p>
+                      <p className="text-sm font-semibold text-ivory">{player.name}</p>
                       <p className="text-xs text-text-secondary">
                         ELO {player.elo} · {player.stats.gamesPlayed} games
                       </p>
@@ -79,7 +79,7 @@ export default function PlayerList() {
                         e.stopPropagation();
                         setEditId(player.id);
                       }}
-                      className="rounded-xl p-2 text-text-secondary opacity-0 transition-all hover:bg-white/[0.05] group-hover:opacity-100"
+                      className="rounded-xl p-2 text-text-muted opacity-0 transition-all hover:bg-separator hover:text-ivory group-hover:opacity-100"
                     >
                       <Pencil size={14} />
                     </button>
@@ -90,14 +90,14 @@ export default function PlayerList() {
                           e.stopPropagation();
                           setDeleteId(player.id);
                         }}
-                        className="rounded-xl p-2 text-text-secondary opacity-0 transition-all hover:bg-red/10 hover:text-red group-hover:opacity-100"
+                        className="rounded-xl p-2 text-text-muted opacity-0 transition-all hover:bg-red/10 hover:text-red group-hover:opacity-100"
                       >
                         <Trash2 size={14} />
                       </button>
                     )}
                     <ChevronRight
                       size={16}
-                      className="ml-1 text-text-secondary"
+                      className="ml-1 text-text-muted"
                     />
                   </div>
                 </Link>

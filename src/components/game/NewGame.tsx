@@ -70,12 +70,12 @@ export default function NewGame() {
             else if (step === 'order') setStep('select');
             else setStep('order');
           }}
-          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
+          className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
         >
           <ChevronLeft size={18} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">New Game</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">New Game</h1>
           <p className="text-xs text-text-secondary">
             Step {stepIndex + 1} of 3
           </p>
@@ -87,7 +87,7 @@ export default function NewGame() {
         {(['select', 'order', 'settings'] as const).map((s, i) => (
           <div
             key={s}
-            className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.06]"
+            className="h-1 flex-1 overflow-hidden rounded-full bg-separator"
           >
             <motion.div
               className="h-full rounded-full gradient-accent"
@@ -113,7 +113,7 @@ export default function NewGame() {
               </p>
               <button
                 onClick={() => setShowAddPlayer(true)}
-                className="flex items-center gap-1.5 rounded-xl bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent-light transition-colors hover:bg-accent/20"
+                className="flex items-center gap-1.5 rounded-xl border border-accent/30 px-3 py-1.5 text-xs font-medium text-accent-light transition-colors hover:bg-accent/10"
               >
                 <UserPlus size={14} />
                 Add New
@@ -121,7 +121,7 @@ export default function NewGame() {
             </div>
 
             {players.length === 0 ? (
-              <div className="rounded-2xl glass p-10 text-center">
+              <div className="rounded-2xl card-surface p-10 text-center">
                 <p className="text-sm text-text-secondary">
                   No players yet. Add some to get started.
                 </p>
@@ -144,13 +144,13 @@ export default function NewGame() {
                       className={clsx(
                         'flex items-center gap-2.5 rounded-2xl p-3 text-left transition-all',
                         selected
-                          ? 'bg-accent/10 ring-1 ring-accent/40 glow-accent'
-                          : 'glass hover:bg-white/[0.06]',
+                          ? 'bg-accent/10 ring-1 ring-accent/30 glow-accent'
+                          : 'card-surface hover:card-surface-hover',
                       )}
                     >
                       <Avatar name={player.name} size="md" />
                       <div className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium">
+                        <span className="block truncate text-sm font-medium text-ivory">
                           {player.name}
                         </span>
                         <span className="text-[10px] text-text-secondary">
@@ -203,26 +203,26 @@ export default function NewGame() {
                   <motion.div
                     key={id}
                     layout
-                    className="flex items-center gap-3 rounded-2xl glass p-3"
+                    className="flex items-center gap-3 rounded-2xl card-surface p-3"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.08] text-xs font-bold text-text-secondary">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-separator text-xs font-bold text-text-secondary">
                       {i + 1}
                     </span>
                     <Avatar name={player?.name ?? ''} size="sm" />
-                    <span className="flex-1 text-sm font-medium">
+                    <span className="flex-1 text-sm font-medium text-ivory">
                       {player?.name}
                     </span>
                     <button
                       onClick={() => movePlayer(i, -1)}
                       disabled={i === 0}
-                      className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-white/[0.08] disabled:opacity-20"
+                      className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-separator disabled:opacity-20"
                     >
                       <ArrowUp size={16} />
                     </button>
                     <button
                       onClick={() => movePlayer(i, 1)}
                       disabled={i === orderedIds.length - 1}
-                      className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-white/[0.08] disabled:opacity-20"
+                      className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-separator disabled:opacity-20"
                     >
                       <ArrowDown size={16} />
                     </button>
@@ -249,7 +249,7 @@ export default function NewGame() {
             exit={{ opacity: 0, x: 20 }}
           >
             <div className="space-y-4">
-              <div className="rounded-2xl glass p-5">
+              <div className="rounded-2xl card-surface p-5">
                 <label className="mb-3 block text-sm font-medium text-text-secondary">
                   Max cards per round
                 </label>
@@ -266,12 +266,12 @@ export default function NewGame() {
                     {maxCards}
                   </span>
                 </div>
-                <p className="mt-2 text-xs text-text-secondary">
+                <p className="mt-2 text-xs text-text-muted">
                   {roundCount} total rounds (1 → {maxCards} → 1)
                 </p>
               </div>
 
-              <div className="rounded-2xl glass p-5">
+              <div className="rounded-2xl card-surface p-5">
                 <label className="mb-3 block text-sm font-medium text-text-secondary">
                   First dealer
                 </label>
@@ -285,8 +285,8 @@ export default function NewGame() {
                         className={clsx(
                           'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all',
                           dealerIndex === i
-                            ? 'bg-accent/10 font-semibold text-accent-light ring-1 ring-accent/30'
-                            : 'text-text-secondary hover:bg-white/[0.04] hover:text-white',
+                            ? 'bg-accent/10 font-semibold text-accent-light ring-1 ring-accent/25'
+                            : 'text-text-secondary hover:bg-separator hover:text-ivory',
                         )}
                       >
                         <Avatar name={player?.name ?? ''} size="sm" />
@@ -298,9 +298,9 @@ export default function NewGame() {
                 </div>
               </div>
 
-              <div className="rounded-2xl glass p-4">
-                <p className="text-xs text-text-secondary">Scoring</p>
-                <p className="mt-0.5 text-sm font-medium">
+              <div className="rounded-2xl card-surface p-4">
+                <p className="text-xs text-text-muted">Scoring</p>
+                <p className="mt-0.5 text-sm font-medium text-ivory">
                   Exact bid = 10 + tricks · Miss = tricks taken
                 </p>
               </div>
@@ -308,7 +308,7 @@ export default function NewGame() {
 
             <button
               onClick={handleStart}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl gradient-green py-3.5 font-semibold text-white transition-all active:scale-[0.98] glow-green"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl gradient-green py-3.5 font-semibold text-white transition-all active:scale-[0.98] glow-accent"
             >
               <Sparkles size={18} />
               Start Game

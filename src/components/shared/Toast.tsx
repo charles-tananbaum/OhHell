@@ -21,7 +21,7 @@ export default function Toast() {
             ) : (
               <XCircle size={16} className="text-red" />
             )}
-            <span className="text-sm font-medium text-text-primary">
+            <span className="text-sm font-medium text-ivory">
               {toast.message}
             </span>
           </motion.div>

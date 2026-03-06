@@ -29,12 +29,12 @@ export default function GameReview() {
       <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => navigate('/')}
-          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
+          className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
         >
           <ChevronLeft size={18} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Game Review</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Game Review</h1>
           <p className="text-xs text-text-secondary">
             {new Date(game.date).toLocaleDateString()} ·{' '}
             {game.playerIds.map(getName).join(', ')}
@@ -44,8 +44,8 @@ export default function GameReview() {
 
       {/* Final scores */}
       {game.finalScores && (
-        <div className="mb-4 rounded-2xl glass p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+        <div className="mb-4 rounded-2xl card-surface p-4">
+          <h3 className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.15em] text-text-secondary">
             Final Scores
           </h3>
           {(() => {
@@ -58,16 +58,16 @@ export default function GameReview() {
                 {ranked.map((pid) => (
                   <div
                     key={pid}
-                    className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2"
+                    className="flex items-center justify-between rounded-xl bg-separator/50 px-3 py-2"
                   >
                     <span className="flex items-center gap-2.5 text-sm">
-                      <span className="text-xs font-bold text-text-secondary">
+                      <span className="text-xs font-bold text-text-muted">
                         #{placements[pid]}
                       </span>
                       <Avatar name={getName(pid)} size="sm" />
-                      {getName(pid)}
+                      <span className="text-ivory">{getName(pid)}</span>
                     </span>
-                    <span className="text-sm font-bold">
+                    <span className="text-sm font-bold text-ivory">
                       {game.finalScores![pid]}
                     </span>
                   </div>
@@ -79,10 +79,10 @@ export default function GameReview() {
       )}
 
       {/* Round-by-round */}
-      <div className="overflow-x-auto rounded-2xl glass">
+      <div className="overflow-x-auto rounded-2xl card-surface">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/[0.06]">
+            <tr className="border-b border-separator-strong">
               <th className="px-3 py-2.5 text-left text-xs font-medium text-text-secondary">
                 Rnd
               </th>
@@ -101,11 +101,11 @@ export default function GameReview() {
           </thead>
           <tbody>
             {completedRounds.map((round) => (
-              <tr key={round.roundNumber} className="border-b border-white/[0.04]">
+              <tr key={round.roundNumber} className="border-b border-separator">
                 <td className="px-3 py-2 text-text-secondary">
                   {round.roundNumber}
                 </td>
-                <td className="px-3 py-2 text-text-secondary">
+                <td className="px-3 py-2 text-text-muted">
                   {round.cardsDealt}
                 </td>
                 {game.playerIds.map((pid) => {

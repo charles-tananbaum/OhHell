@@ -1,58 +1,63 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Gamepad2, Users, Trophy, BarChart3 } from 'lucide-react';
-import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
+import { Spade, Users, Trophy, BarChart3 } from 'lucide-react';
 
-const links = [
-  { to: '/', icon: Gamepad2, label: 'Games' },
+const tabs = [
+  { to: '/', icon: Spade, label: 'Games' },
   { to: '/players', icon: Users, label: 'Players' },
-  { to: '/leaderboard', icon: Trophy, label: 'Board' },
+  { to: '/leaderboard', icon: Trophy, label: 'Rankings' },
   { to: '/sabermetrics', icon: BarChart3, label: 'Stats' },
 ];
 
 export default function NavBar() {
   const location = useLocation();
 
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/' || location.pathname.startsWith('/games');
+    return location.pathname.startsWith(path);
+  };
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.06] bg-black/80 backdrop-blur-xl safe-area-bottom">
-      <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2">
-        {links.map(({ to, icon: Icon, label }) => {
-          const isActive =
-            to === '/'
-              ? location.pathname === '/' ||
-                location.pathname.startsWith('/games')
-              : location.pathname.startsWith(to);
-          return (
-            <NavLink
-              key={to}
-              to={to}
-              className="relative flex flex-col items-center gap-0.5 px-4 py-1"
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="nav-indicator"
-                  className="absolute -top-[1px] left-2 right-2 h-[2px] rounded-full gradient-accent"
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
-              <Icon
-                size={20}
-                className={clsx(
-                  'transition-colors',
-                  isActive ? 'text-accent-light' : 'text-text-secondary',
-                )}
-              />
-              <span
-                className={clsx(
-                  'text-[10px] font-medium transition-colors',
-                  isActive ? 'text-accent-light' : 'text-text-secondary',
-                )}
+    <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]">
+      <div className="glass-strong border-t border-separator-strong">
+        <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">
+          {tabs.map(({ to, icon: Icon, label }) => {
+            const active = isActive(to);
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                className="relative flex flex-col items-center gap-0.5 px-5 py-2"
               >
-                {label}
-              </span>
-            </NavLink>
-          );
-        })}
+                {active && (
+                  <motion.div
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-xl"
+                    style={{
+                      background: 'linear-gradient(145deg, rgba(45, 122, 79, 0.12), rgba(45, 122, 79, 0.04))',
+                      border: '1px solid rgba(45, 122, 79, 0.18)',
+                    }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <Icon
+                  size={19}
+                  strokeWidth={active ? 2.2 : 1.5}
+                  className={`relative z-10 transition-colors duration-200 ${
+                    active ? 'text-accent-light' : 'text-text-muted'
+                  }`}
+                />
+                <span
+                  className={`relative z-10 text-[10px] font-medium tracking-wide transition-colors duration-200 ${
+                    active ? 'text-accent-light' : 'text-text-muted'
+                  }`}
+                >
+                  {label}
+                </span>
+              </NavLink>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );

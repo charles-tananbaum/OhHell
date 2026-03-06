@@ -8,7 +8,7 @@ interface EloChartProps {
 export default function EloChart({ history }: EloChartProps) {
   if (history.length === 0) {
     return (
-      <div className="flex h-36 items-center justify-center rounded-2xl glass text-xs text-text-secondary">
+      <div className="flex h-36 items-center justify-center rounded-2xl card-surface text-xs text-text-secondary">
         No ELO history yet
       </div>
     );
@@ -39,7 +39,6 @@ export default function EloChart({ history }: EloChartProps) {
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${getX(i)},${getY(p.elo)}`)
     .join(' ');
 
-  // Gradient fill area
   const areaData =
     pathData +
     ` L${getX(points.length - 1)},${height - padding} L${padding},${height - padding} Z`;
@@ -47,11 +46,11 @@ export default function EloChart({ history }: EloChartProps) {
   const lastElo = points[points.length - 1].elo;
   const firstElo = points[0].elo;
   const isUp = lastElo >= firstElo;
-  const strokeColor = isUp ? '#34d399' : '#f87171';
+  const strokeColor = isUp ? '#3da066' : '#c45c4a';
   const gradientId = isUp ? 'elo-grad-up' : 'elo-grad-down';
 
   return (
-    <div className="rounded-2xl glass p-4">
+    <div className="rounded-2xl card-surface p-4">
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="w-full"
@@ -59,12 +58,12 @@ export default function EloChart({ history }: EloChartProps) {
       >
         <defs>
           <linearGradient id="elo-grad-up" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#34d399" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
+            <stop offset="0%" stopColor="#3da066" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#3da066" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="elo-grad-down" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f87171" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#f87171" stopOpacity="0" />
+            <stop offset="0%" stopColor="#c45c4a" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#c45c4a" stopOpacity="0" />
           </linearGradient>
         </defs>
         <path d={areaData} fill={`url(#${gradientId})`} />
@@ -82,13 +81,13 @@ export default function EloChart({ history }: EloChartProps) {
           cy={getY(lastElo)}
           r={4}
           fill={strokeColor}
-          stroke="#09090b"
+          stroke="#0c0f0a"
           strokeWidth={2}
         />
       </svg>
-      <div className="mt-1 flex justify-between text-[10px] text-text-secondary">
+      <div className="mt-1 flex justify-between text-[10px] text-text-muted">
         <span>{minElo}</span>
-        <span className="font-semibold text-text-primary">{lastElo}</span>
+        <span className="font-semibold text-ivory">{lastElo}</span>
         <span>{maxElo}</span>
       </div>
     </div>

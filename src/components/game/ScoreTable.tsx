@@ -47,14 +47,14 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="max-h-[85vh] w-full max-w-[95vw] overflow-auto rounded-3xl border border-white/[0.08] bg-surface p-4"
+        className="max-h-[85vh] w-full max-w-[95vw] overflow-auto rounded-3xl border border-separator-strong bg-surface-raised p-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-bold">Score Sheet</h3>
+          <h3 className="font-display text-base font-bold text-ivory">Score Sheet</h3>
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 text-text-secondary transition-colors hover:bg-white/[0.05] hover:text-white"
+            className="rounded-full p-1.5 text-text-secondary transition-colors hover:bg-separator hover:text-ivory"
           >
             <X size={18} />
           </button>
@@ -68,8 +68,8 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-white/[0.06] text-text-secondary">
-                  <th className="sticky left-0 bg-surface px-2 py-2 text-left font-medium">
+                <tr className="border-b border-separator-strong text-text-secondary">
+                  <th className="sticky left-0 bg-surface-raised px-2 py-2 text-left font-medium">
                     Rnd
                   </th>
                   <th className="px-2 py-2 text-center font-medium">Cards</th>
@@ -87,12 +87,12 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
                 {completedRounds.map((round, ri) => (
                   <tr
                     key={round.roundNumber}
-                    className="border-b border-white/[0.04]"
+                    className="border-b border-separator"
                   >
-                    <td className="sticky left-0 bg-surface px-2 py-2 font-medium">
+                    <td className="sticky left-0 bg-surface-raised px-2 py-2 font-medium text-ivory">
                       {round.roundNumber}
                     </td>
-                    <td className="px-2 py-2 text-center text-text-secondary">
+                    <td className="px-2 py-2 text-center text-text-muted">
                       {round.cardsDealt}
                     </td>
                     {game.playerIds.map((id) => {
@@ -115,10 +115,10 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
                             </span>
                           </div>
                           <div className="mt-0.5">
-                            <span className={hit ? 'font-bold text-green' : 'text-text-secondary'}>
+                            <span className={hit ? 'font-bold text-green' : 'text-text-muted'}>
                               +{score}
                             </span>
-                            <span className="ml-1 text-[10px] text-text-secondary">
+                            <span className="ml-1 text-[10px] text-text-muted">
                               ({total})
                             </span>
                           </div>
@@ -128,8 +128,8 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
                   </tr>
                 ))}
 
-                <tr className="bg-white/[0.02] font-bold">
-                  <td className="sticky left-0 bg-surface px-2 py-2.5" colSpan={2}>
+                <tr className="bg-separator/30 font-bold">
+                  <td className="sticky left-0 bg-surface-raised px-2 py-2.5 text-ivory" colSpan={2}>
                     Total
                   </td>
                   {game.playerIds.map((id) => (

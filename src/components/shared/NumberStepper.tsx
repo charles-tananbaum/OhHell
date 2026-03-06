@@ -28,7 +28,7 @@ export default function NumberStepper({
           type="button"
           onClick={() => onChange(Math.max(min, value - 1))}
           disabled={value <= min}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] text-white transition-all hover:bg-white/[0.1] active:scale-95 disabled:opacity-30"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-30"
         >
           <Minus size={16} />
         </button>
@@ -37,7 +37,7 @@ export default function NumberStepper({
             'flex h-9 w-11 items-center justify-center rounded-xl text-sm font-bold',
             disabled !== undefined && value === disabled
               ? 'bg-red/15 text-red ring-1 ring-red/20'
-              : 'bg-white/[0.05] text-white',
+              : 'card-surface text-ivory',
           )}
         >
           {value}
@@ -46,7 +46,7 @@ export default function NumberStepper({
           type="button"
           onClick={() => onChange(Math.min(max, value + 1))}
           disabled={value >= max}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] text-white transition-all hover:bg-white/[0.1] active:scale-95 disabled:opacity-30"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-30"
         >
           <Plus size={16} />
         </button>

@@ -16,7 +16,7 @@ export default function LoginGate({ children }: { children: React.ReactNode }) {
 
   if (!loaded) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#09090b]">
+      <div className="felt-bg flex min-h-dvh items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -41,9 +41,10 @@ export default function LoginGate({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[#09090b] px-4">
+    <div className="felt-bg flex min-h-dvh items-center justify-center px-4">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-accent/10 blur-[100px]" />
+        <div className="absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-accent/8 blur-[120px]" />
+        <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-gold/5 blur-[100px]" />
       </div>
 
       <motion.div
@@ -61,7 +62,7 @@ export default function LoginGate({ children }: { children: React.ReactNode }) {
           >
             <Spade size={40} className="text-white" />
           </motion.div>
-          <h1 className="text-3xl font-bold tracking-tight">Oh Hell</h1>
+          <h1 className="font-display text-4xl font-bold tracking-tight text-ivory">Oh Hell</h1>
           <p className="mt-2 text-sm text-text-secondary">
             Enter the password to continue
           </p>
@@ -75,12 +76,12 @@ export default function LoginGate({ children }: { children: React.ReactNode }) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Password"
               autoFocus
-              className="w-full rounded-2xl bg-white/[0.05] px-5 py-4 pr-12 text-white placeholder-text-secondary outline-none ring-1 ring-white/[0.08] transition-all focus:ring-accent/50 focus:bg-white/[0.07]"
+              className="w-full rounded-2xl border border-separator bg-surface-raised px-5 py-4 pr-12 text-ivory placeholder-text-muted outline-none transition-all focus:border-accent/40 focus:bg-card-solid"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary transition-colors hover:text-white"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary transition-colors hover:text-ivory"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>

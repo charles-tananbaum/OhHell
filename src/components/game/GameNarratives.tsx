@@ -25,10 +25,10 @@ export default function GameNarratives({ game }: GameNarrativesProps) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ delay: i * 0.1 }}
-            className="flex items-start gap-2.5 rounded-2xl bg-accent/[0.06] border border-accent/15 px-4 py-2.5"
+            className="flex items-start gap-2.5 rounded-2xl border border-gold/10 bg-gold/[0.04] px-4 py-2.5"
           >
             <span className="mt-0.5 text-sm leading-none">{n.emoji}</span>
-            <p className="text-xs font-medium leading-relaxed text-text-primary">
+            <p className="text-xs font-medium leading-relaxed text-ivory/80">
               {n.text}
             </p>
           </motion.div>

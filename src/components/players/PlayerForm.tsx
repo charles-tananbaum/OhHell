@@ -37,7 +37,7 @@ export default function PlayerForm({ onClose, editId }: PlayerFormProps) {
           placeholder="Player name"
           maxLength={30}
           autoFocus
-          className="mb-5 w-full rounded-2xl bg-white/[0.05] px-5 py-4 text-white placeholder-text-secondary outline-none ring-1 ring-white/[0.08] transition-all focus:ring-accent/50 focus:bg-white/[0.07]"
+          className="mb-5 w-full rounded-2xl border border-separator bg-surface px-5 py-4 text-ivory placeholder-text-muted outline-none transition-all focus:border-accent/40 focus:bg-surface-raised"
         />
         <button
           type="submit"

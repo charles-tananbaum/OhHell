@@ -30,7 +30,7 @@ const columns = [
 export default function PlayerAnalysis({ analysis }: PlayerAnalysisProps) {
   if (!analysis) {
     return (
-      <div className="rounded-2xl glass p-6 text-center text-sm text-text-secondary">
+      <div className="rounded-2xl card-surface p-6 text-center text-sm text-text-secondary">
         Not enough data yet — play some games first!
       </div>
     );
@@ -43,18 +43,18 @@ export default function PlayerAnalysis({ analysis }: PlayerAnalysisProps) {
   );
 
   return (
-    <div className="overflow-x-auto rounded-2xl glass">
+    <div className="overflow-x-auto rounded-2xl card-surface">
       <table className="w-full">
         <thead>
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
-                className="w-1/3 border-b border-white/[0.06] px-3 py-3 text-left"
+                className="w-1/3 border-b border-separator-strong px-3 py-3 text-left"
               >
                 <div className="flex items-center gap-1.5">
                   <col.icon size={14} className={col.colors.header} />
-                  <span className={`text-xs font-semibold uppercase tracking-wider ${col.colors.header}`}>
+                  <span className={`font-display text-xs font-semibold uppercase tracking-wider ${col.colors.header}`}>
                     {col.label}
                   </span>
                 </div>
@@ -69,7 +69,7 @@ export default function PlayerAnalysis({ analysis }: PlayerAnalysisProps) {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: rowIdx * 0.05 }}
-              className="border-b border-white/[0.04] last:border-b-0"
+              className="border-b border-separator last:border-b-0"
             >
               {columns.map((col) => {
                 const item: PlayerAnalysisItem | undefined = analysis[col.key][rowIdx];
@@ -80,7 +80,7 @@ export default function PlayerAnalysis({ analysis }: PlayerAnalysisProps) {
                   >
                     {item ? (
                       <div>
-                        <p className="text-xs font-semibold">{item.title}</p>
+                        <p className="text-xs font-semibold text-ivory">{item.title}</p>
                         <p className="mt-0.5 text-[11px] leading-relaxed text-text-secondary">
                           {item.detail}
                         </p>

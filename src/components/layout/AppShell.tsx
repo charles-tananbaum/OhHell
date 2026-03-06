@@ -4,10 +4,12 @@ import Toast from '../shared/Toast';
 
 export default function AppShell() {
   return (
-    <div className="min-h-dvh bg-[#09090b] page-bg">
-      <main className="mx-auto max-w-lg px-4 pb-24 pt-6">
-        <Outlet />
-      </main>
+    <div className="felt-bg relative min-h-dvh pb-20">
+      <div className="page-bg min-h-dvh">
+        <main className="mx-auto max-w-lg px-4 pt-6 pb-4">
+          <Outlet />
+        </main>
+      </div>
       <NavBar />
       <Toast />
     </div>

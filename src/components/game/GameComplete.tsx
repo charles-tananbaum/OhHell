@@ -6,7 +6,7 @@ import { getPlacementsFromScores } from '../../lib/stats';
 import Avatar from '../shared/Avatar';
 
 const PODIUM_COLORS = ['text-gold', 'text-silver', 'text-bronze'];
-const PODIUM_GRADIENT = ['gradient-gold', 'bg-silver/15', 'bg-bronze/15'];
+const PODIUM_BG = ['bg-gold/10', 'bg-silver/10', 'bg-bronze/10'];
 
 export default function GameComplete() {
   const { id } = useParams<{ id: string }>();
@@ -32,11 +32,11 @@ export default function GameComplete() {
       <div className="mb-6 flex items-center gap-3">
         <button
           onClick={() => navigate('/')}
-          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
+          className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
         >
           <ArrowLeft size={18} />
         </button>
-        <h1 className="text-2xl font-bold tracking-tight">Game Complete</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Game Complete</h1>
       </div>
 
       {/* Podium */}
@@ -64,15 +64,11 @@ export default function GameComplete() {
                   </motion.div>
                 )}
                 <div
-                  className={`flex h-16 w-16 items-center justify-center rounded-2xl ${PODIUM_GRADIENT[i]} ${
-                    i === 0 ? 'ring-2 ring-gold/30' : ''
+                  className={`flex items-center justify-center rounded-2xl ${PODIUM_BG[i]} ${
+                    i === 0 ? 'h-16 w-16 ring-2 ring-gold/25' : 'h-14 w-14'
                   }`}
                 >
-                  {i === 0 ? (
-                    <Avatar name={player?.name ?? '?'} size="xl" />
-                  ) : (
-                    <Avatar name={player?.name ?? '?'} size="lg" />
-                  )}
+                  <Avatar name={player?.name ?? '?'} size={i === 0 ? 'xl' : 'lg'} />
                 </div>
               </div>
               <span className={`text-sm font-bold ${PODIUM_COLORS[i]}`}>
@@ -85,8 +81,8 @@ export default function GameComplete() {
       </div>
 
       {/* Full standings */}
-      <div className="rounded-2xl glass p-4">
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+      <div className="rounded-2xl card-surface p-4">
+        <h3 className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.15em] text-text-secondary">
           Standings & ELO Changes
         </h3>
         <div className="space-y-2">
@@ -100,28 +96,28 @@ export default function GameComplete() {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-3"
+                className="flex items-center justify-between rounded-xl bg-separator/50 px-3 py-3"
               >
                 <div className="flex items-center gap-2.5">
                   <span
                     className={`text-xs font-bold ${
-                      i < 3 ? PODIUM_COLORS[i] : 'text-text-secondary'
+                      i < 3 ? PODIUM_COLORS[i] : 'text-text-muted'
                     }`}
                   >
                     #{placements[id]}
                   </span>
                   <Avatar name={player?.name ?? '?'} size="sm" />
-                  <span className="text-sm font-medium">{player?.name}</span>
+                  <span className="text-sm font-medium text-ivory">{player?.name}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold">{score}</span>
+                  <span className="text-sm font-bold text-ivory">{score}</span>
                   <span
                     className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
                       eloChange > 0
                         ? 'bg-green/10 text-green'
                         : eloChange < 0
                           ? 'bg-red/10 text-red'
-                          : 'bg-white/[0.05] text-text-secondary'
+                          : 'bg-separator text-text-secondary'
                     }`}
                   >
                     {eloChange > 0 ? (
@@ -142,7 +138,7 @@ export default function GameComplete() {
       <div className="mt-5 flex gap-3">
         <Link
           to="/"
-          className="flex flex-1 items-center justify-center rounded-2xl bg-white/[0.05] py-3.5 text-sm font-medium text-white transition-all hover:bg-white/[0.08]"
+          className="flex flex-1 items-center justify-center rounded-2xl border border-separator py-3.5 text-sm font-medium text-ivory transition-all hover:bg-separator"
         >
           Home
         </Link>

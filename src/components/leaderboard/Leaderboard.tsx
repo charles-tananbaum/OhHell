@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trophy, TrendingUp, TrendingDown, Crown } from 'lucide-react';
@@ -9,14 +10,17 @@ const RANK_COLORS = ['text-gold', 'text-silver', 'text-bronze'];
 
 export default function Leaderboard() {
   const players = useStore((s) => s.players);
-  const ranked = [...players]
-    .filter((p) => p.stats.gamesPlayed > 0)
-    .sort((a, b) => b.elo - a.elo);
+  const ranked = useMemo(
+    () => [...players]
+      .filter((p) => p.stats.gamesPlayed > 0)
+      .sort((a, b) => b.elo - a.elo),
+    [players],
+  );
 
   if (ranked.length === 0) {
     return (
       <div>
-        <h1 className="mb-6 text-2xl font-bold tracking-tight">Leaderboard</h1>
+        <h1 className="mb-6 font-display text-3xl font-bold tracking-tight text-ivory">Leaderboard</h1>
         <EmptyState
           icon={Trophy}
           title="No rankings yet"
@@ -28,7 +32,7 @@ export default function Leaderboard() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold tracking-tight">Leaderboard</h1>
+      <h1 className="mb-6 font-display text-3xl font-bold tracking-tight text-ivory">Leaderboard</h1>
 
       {/* Top 3 podium */}
       {ranked.length >= 1 && (
@@ -45,11 +49,11 @@ export default function Leaderboard() {
               <span className="mt-1.5 text-xs font-bold text-silver">
                 {ranked[1].name}
               </span>
-              <span className="text-lg font-bold text-text-primary">
+              <span className="font-display text-lg font-bold text-ivory">
                 {ranked[1].elo}
               </span>
-              <div className="mt-1 flex h-16 w-20 items-center justify-center rounded-t-xl bg-silver/10">
-                <span className="text-2xl font-bold text-silver">2</span>
+              <div className="mt-1 flex h-16 w-20 items-center justify-center rounded-t-xl bg-silver/8 border-t border-x border-silver/15">
+                <span className="font-display text-2xl font-bold text-silver">2</span>
               </div>
             </motion.div>
           )}
@@ -69,15 +73,15 @@ export default function Leaderboard() {
               >
                 <Crown size={20} className="text-gold" />
               </motion.div>
-              <Avatar name={ranked[0].name} size="xl" className="ring-2 ring-gold/30" />
+              <Avatar name={ranked[0].name} size="xl" className="ring-2 ring-gold/25" />
             </div>
             <span className="mt-1.5 text-sm font-bold text-gold">
               {ranked[0].name}
             </span>
-            <span className="text-xl font-bold text-text-primary">
+            <span className="font-display text-xl font-bold text-ivory">
               {ranked[0].elo}
             </span>
-            <div className="mt-1 flex h-24 w-20 items-center justify-center rounded-t-xl gradient-gold/10 bg-gold/10">
+            <div className="mt-1 flex h-24 w-20 items-center justify-center rounded-t-xl bg-gold/8 border-t border-x border-gold/15">
               <Trophy size={28} className="text-gold" />
             </div>
           </motion.div>
@@ -94,11 +98,11 @@ export default function Leaderboard() {
               <span className="mt-1.5 text-xs font-bold text-bronze">
                 {ranked[2].name}
               </span>
-              <span className="text-lg font-bold text-text-primary">
+              <span className="font-display text-lg font-bold text-ivory">
                 {ranked[2].elo}
               </span>
-              <div className="mt-1 flex h-12 w-20 items-center justify-center rounded-t-xl bg-bronze/10">
-                <span className="text-2xl font-bold text-bronze">3</span>
+              <div className="mt-1 flex h-12 w-20 items-center justify-center rounded-t-xl bg-bronze/8 border-t border-x border-bronze/15">
+                <span className="font-display text-2xl font-bold text-bronze">3</span>
               </div>
             </motion.div>
           )}
@@ -123,21 +127,21 @@ export default function Leaderboard() {
             >
               <Link
                 to={`/players/${player.id}`}
-                className="flex items-center justify-between rounded-2xl glass p-4 transition-all hover:bg-white/[0.06]"
+                className="flex items-center justify-between rounded-2xl card-surface p-4 transition-all hover:card-surface-hover"
               >
                 <div className="flex items-center gap-3">
                   <span
                     className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ${
                       i < 3
-                        ? `${RANK_COLORS[i]} bg-white/[0.05]`
-                        : 'text-text-secondary bg-white/[0.03]'
+                        ? `${RANK_COLORS[i]} bg-separator`
+                        : 'text-text-muted bg-separator/50'
                     }`}
                   >
                     {i + 1}
                   </span>
                   <Avatar name={player.name} size="md" />
                   <div>
-                    <p className="text-sm font-semibold">{player.name}</p>
+                    <p className="text-sm font-semibold text-ivory">{player.name}</p>
                     <p className="text-[10px] text-text-secondary">
                       {player.stats.gamesPlayed} games ·{' '}
                       {player.stats.gamesWon} wins
@@ -145,7 +149,7 @@ export default function Leaderboard() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold">{player.elo}</p>
+                  <p className="font-display text-lg font-bold text-ivory">{player.elo}</p>
                   {recentChange !== 0 && (
                     <p
                       className={`flex items-center justify-end gap-0.5 text-[10px] font-semibold ${

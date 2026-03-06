@@ -1,3 +1,4 @@
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { Pencil } from 'lucide-react';
@@ -29,6 +30,8 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
 
   const currentPlayer = players.find((p) => p.id === currentBidderId);
 
+  const [focusedBid, setFocusedBid] = useState(0);
+
   const handleBid = (bid: number) => {
     if (!currentBidderId) return;
     submitBid(gameId, currentBidderId, bid);
@@ -38,13 +41,41 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
     reviseBid(gameId, playerId);
   };
 
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!currentBidderId) return;
+      const maxBid = round.cardsDealt;
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedBid((prev) => Math.min(prev + 1, maxBid));
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedBid((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (restrictedBid !== focusedBid) {
+          handleBid(focusedBid);
+        }
+      }
+    },
+    [currentBidderId, round.cardsDealt, restrictedBid, focusedBid],
+  );
+
+  useEffect(() => {
+    if (currentBidderId) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [currentBidderId, handleKeyDown]);
+
   return (
-    <div className="rounded-2xl glass p-4">
+    <div className="rounded-2xl card-surface p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">
+        <h3 className="font-display text-base font-semibold text-ivory">
           Bidding · {round.cardsDealt} card{round.cardsDealt !== 1 ? 's' : ''}
         </h3>
-        <span className="text-xs text-text-secondary">
+        <span className="text-xs text-text-muted">
           Dealer: {players.find((p) => p.id === round.dealerPlayerId)?.name}
         </span>
       </div>
@@ -59,7 +90,7 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
               key={id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="mb-1.5 flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2"
+              className="mb-1.5 flex items-center justify-between rounded-xl bg-separator/50 px-3 py-2"
             >
               <span className="flex items-center gap-2 text-sm text-text-secondary">
                 <Avatar name={player?.name ?? '?'} size="sm" />
@@ -76,7 +107,7 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
                 </span>
                 <button
                   onClick={() => handleRevise(id)}
-                  className="rounded-lg p-1 text-text-secondary transition-colors hover:text-accent-light"
+                  className="rounded-lg p-1 text-text-muted transition-colors hover:text-accent-light"
                   title="Revise bid"
                 >
                   <Pencil size={12} />
@@ -95,7 +126,7 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
           animate={{ opacity: 1, y: 0 }}
           className="mt-4"
         >
-          <p className="mb-3 flex items-center justify-center gap-2 text-sm font-semibold">
+          <p className="mb-3 flex items-center justify-center gap-2 font-display text-base font-semibold text-ivory">
             <Avatar name={currentPlayer?.name ?? '?'} size="sm" />
             {currentPlayer?.name}'s bid
             {currentBidderId === round.dealerPlayerId && (
@@ -122,8 +153,9 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
                     className={clsx(
                       'flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-bold transition-all',
                       isRestricted
-                        ? 'bg-red/10 text-red/30 cursor-not-allowed ring-1 ring-red/10'
-                        : 'bg-white/[0.05] text-white ring-1 ring-white/[0.06] hover:ring-accent/50 hover:bg-accent/10 hover:text-accent-light',
+                        ? 'bg-red/8 text-red/30 cursor-not-allowed ring-1 ring-red/10'
+                        : 'card-surface text-ivory ring-1 ring-separator hover:ring-accent/40 hover:bg-accent/10 hover:text-accent-light',
+                      focusedBid === n && !isRestricted && 'ring-2 ring-accent-light bg-accent/15',
                     )}
                   >
                     {n}
