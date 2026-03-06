@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Trophy, TrendingUp, TrendingDown } from 'lucide-react';
+import { Trophy, TrendingUp, TrendingDown, Crown } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import EmptyState from '../shared/EmptyState';
+import Avatar from '../shared/Avatar';
 
 const RANK_COLORS = ['text-gold', 'text-silver', 'text-bronze'];
 
@@ -15,7 +16,7 @@ export default function Leaderboard() {
   if (ranked.length === 0) {
     return (
       <div>
-        <h1 className="mb-4 text-xl font-bold">Leaderboard</h1>
+        <h1 className="mb-6 text-2xl font-bold tracking-tight">Leaderboard</h1>
         <EmptyState
           icon={Trophy}
           title="No rankings yet"
@@ -27,7 +28,84 @@ export default function Leaderboard() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-bold">Leaderboard</h1>
+      <h1 className="mb-6 text-2xl font-bold tracking-tight">Leaderboard</h1>
+
+      {/* Top 3 podium */}
+      {ranked.length >= 1 && (
+        <div className="mb-6 flex items-end justify-center gap-3 px-2 pt-4">
+          {/* Second place */}
+          {ranked.length >= 2 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex flex-col items-center"
+            >
+              <Avatar name={ranked[1].name} size="lg" />
+              <span className="mt-1.5 text-xs font-bold text-silver">
+                {ranked[1].name}
+              </span>
+              <span className="text-lg font-bold text-text-primary">
+                {ranked[1].elo}
+              </span>
+              <div className="mt-1 flex h-16 w-20 items-center justify-center rounded-t-xl bg-silver/10">
+                <span className="text-2xl font-bold text-silver">2</span>
+              </div>
+            </motion.div>
+          )}
+
+          {/* First place */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center"
+          >
+            <div className="relative">
+              <motion.div
+                initial={{ scale: 0, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.3, type: 'spring' }}
+                className="absolute -top-4 left-1/2 -translate-x-1/2"
+              >
+                <Crown size={20} className="text-gold" />
+              </motion.div>
+              <Avatar name={ranked[0].name} size="xl" className="ring-2 ring-gold/30" />
+            </div>
+            <span className="mt-1.5 text-sm font-bold text-gold">
+              {ranked[0].name}
+            </span>
+            <span className="text-xl font-bold text-text-primary">
+              {ranked[0].elo}
+            </span>
+            <div className="mt-1 flex h-24 w-20 items-center justify-center rounded-t-xl gradient-gold/10 bg-gold/10">
+              <Trophy size={28} className="text-gold" />
+            </div>
+          </motion.div>
+
+          {/* Third place */}
+          {ranked.length >= 3 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-col items-center"
+            >
+              <Avatar name={ranked[2].name} size="lg" />
+              <span className="mt-1.5 text-xs font-bold text-bronze">
+                {ranked[2].name}
+              </span>
+              <span className="text-lg font-bold text-text-primary">
+                {ranked[2].elo}
+              </span>
+              <div className="mt-1 flex h-12 w-20 items-center justify-center rounded-t-xl bg-bronze/10">
+                <span className="text-2xl font-bold text-bronze">3</span>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {/* Full list */}
       <div className="space-y-2">
         {ranked.map((player, i) => {
           const lastEntry =
@@ -45,23 +123,22 @@ export default function Leaderboard() {
             >
               <Link
                 to={`/players/${player.id}`}
-                className="flex items-center justify-between rounded-2xl bg-card p-4 transition-colors hover:bg-card-hover"
+                className="flex items-center justify-between rounded-2xl glass p-4 transition-all hover:bg-white/[0.06]"
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className={`text-sm font-bold ${
-                      i < 3 ? RANK_COLORS[i] : 'text-text-secondary'
+                    className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ${
+                      i < 3
+                        ? `${RANK_COLORS[i]} bg-white/[0.05]`
+                        : 'text-text-secondary bg-white/[0.03]'
                     }`}
                   >
-                    {i === 0 ? (
-                      <Trophy size={18} className="text-gold" />
-                    ) : (
-                      `#${i + 1}`
-                    )}
+                    {i + 1}
                   </span>
+                  <Avatar name={player.name} size="md" />
                   <div>
                     <p className="text-sm font-semibold">{player.name}</p>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-[10px] text-text-secondary">
                       {player.stats.gamesPlayed} games ·{' '}
                       {player.stats.gamesWon} wins
                     </p>
@@ -71,7 +148,7 @@ export default function Leaderboard() {
                   <p className="text-lg font-bold">{player.elo}</p>
                   {recentChange !== 0 && (
                     <p
-                      className={`flex items-center justify-end gap-0.5 text-xs ${
+                      className={`flex items-center justify-end gap-0.5 text-[10px] font-semibold ${
                         recentChange > 0 ? 'text-green' : 'text-red'
                       }`}
                     >

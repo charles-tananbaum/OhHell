@@ -18,7 +18,6 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
     return { id, name: p?.name ?? '??' };
   });
 
-  // Build running totals
   const runningTotals: Record<string, number[]> = {};
   game.playerIds.forEach((id) => {
     runningTotals[id] = [];
@@ -41,43 +40,43 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="max-h-[85vh] w-full max-w-[95vw] overflow-auto rounded-2xl bg-card p-4"
+        className="max-h-[85vh] w-full max-w-[95vw] overflow-auto rounded-3xl border border-white/[0.08] bg-surface p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Score Sheet</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-sm font-bold">Score Sheet</h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-text-secondary hover:bg-card-hover"
+            className="rounded-full p-1.5 text-text-secondary transition-colors hover:bg-white/[0.05] hover:text-white"
           >
             <X size={18} />
           </button>
         </div>
 
         {completedRounds.length === 0 ? (
-          <p className="py-6 text-center text-sm text-text-secondary">
+          <p className="py-8 text-center text-sm text-text-secondary">
             No completed rounds yet
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-separator text-text-secondary">
-                  <th className="sticky left-0 bg-card px-2 py-1.5 text-left font-medium">
+                <tr className="border-b border-white/[0.06] text-text-secondary">
+                  <th className="sticky left-0 bg-surface px-2 py-2 text-left font-medium">
                     Rnd
                   </th>
-                  <th className="px-2 py-1.5 text-center font-medium">Cards</th>
+                  <th className="px-2 py-2 text-center font-medium">Cards</th>
                   {playerNames.map(({ id, name }) => (
                     <th
                       key={id}
-                      className="min-w-[72px] px-2 py-1.5 text-center font-medium"
+                      className="min-w-[72px] px-2 py-2 text-center font-medium"
                     >
                       {name}
                     </th>
@@ -88,12 +87,12 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
                 {completedRounds.map((round, ri) => (
                   <tr
                     key={round.roundNumber}
-                    className="border-b border-separator/40"
+                    className="border-b border-white/[0.04]"
                   >
-                    <td className="sticky left-0 bg-card px-2 py-1.5 font-medium">
+                    <td className="sticky left-0 bg-surface px-2 py-2 font-medium">
                       {round.roundNumber}
                     </td>
-                    <td className="px-2 py-1.5 text-center text-text-secondary">
+                    <td className="px-2 py-2 text-center text-text-secondary">
                       {round.cardsDealt}
                     </td>
                     {game.playerIds.map((id) => {
@@ -104,7 +103,7 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
                       const total = runningTotals[id][ri];
 
                       return (
-                        <td key={id} className="px-2 py-1.5 text-center">
+                        <td key={id} className="px-2 py-2 text-center">
                           <div className="flex items-center justify-center gap-1">
                             {hit ? (
                               <Check size={10} className="flex-shrink-0 text-green" />
@@ -129,13 +128,12 @@ export default function ScoreTable({ game, onClose }: ScoreTableProps) {
                   </tr>
                 ))}
 
-                {/* Totals row */}
-                <tr className="bg-surface/50 font-bold">
-                  <td className="sticky left-0 bg-card px-2 py-2" colSpan={2}>
+                <tr className="bg-white/[0.02] font-bold">
+                  <td className="sticky left-0 bg-surface px-2 py-2.5" colSpan={2}>
                     Total
                   </td>
                   {game.playerIds.map((id) => (
-                    <td key={id} className="px-2 py-2 text-center text-accent">
+                    <td key={id} className="px-2 py-2.5 text-center text-accent-light">
                       {finalCumulative[id]}
                     </td>
                   ))}

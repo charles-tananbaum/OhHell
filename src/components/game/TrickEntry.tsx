@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Minus, Plus, ArrowLeft } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+import Avatar from '../shared/Avatar';
 import type { Round } from '../../types';
 
 interface TrickEntryProps {
@@ -37,17 +38,19 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
   };
 
   return (
-    <div className="rounded-2xl bg-card p-4">
+    <div className="rounded-2xl glass p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold">
           Tricks · {round.cardsDealt} card{round.cardsDealt !== 1 ? 's' : ''}
         </h3>
         <span
-          className={`text-xs font-medium ${
-            isValid ? 'text-green' : 'text-text-secondary'
+          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+            isValid
+              ? 'bg-green/10 text-green'
+              : 'bg-white/[0.05] text-text-secondary'
           }`}
         >
-          Total: {total} / {round.cardsDealt}
+          {total} / {round.cardsDealt}
         </span>
       </div>
 
@@ -60,32 +63,37 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
               key={id}
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between rounded-xl bg-surface px-3 py-2"
+              className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2.5"
             >
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-medium">{player?.name}</span>
-                {id === round.dealerPlayerId && (
-                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gold/20 text-[10px] font-bold text-gold">D</span>
-                )}
-                <span className="text-xs text-text-secondary">
-                  bid {bid}
-                </span>
+              <div className="flex items-center gap-2">
+                <Avatar name={player?.name ?? '?'} size="sm" />
+                <div>
+                  <span className="text-sm font-medium">{player?.name}</span>
+                  {id === round.dealerPlayerId && (
+                    <span className="ml-1.5 inline-flex h-4 items-center rounded-full bg-gold/15 px-1.5 text-[9px] font-bold text-gold">
+                      D
+                    </span>
+                  )}
+                  <span className="ml-2 text-xs text-text-secondary">
+                    bid {bid}
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => updateTrick(id, -1)}
                   disabled={tricks[id] <= 0}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-card text-white disabled:opacity-20"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] text-white transition-all hover:bg-white/[0.1] active:scale-95 disabled:opacity-20"
                 >
                   <Minus size={14} />
                 </button>
-                <span className="flex h-8 w-8 items-center justify-center text-sm font-bold">
+                <span className="flex h-9 w-9 items-center justify-center text-sm font-bold">
                   {tricks[id]}
                 </span>
                 <button
                   onClick={() => updateTrick(id, 1)}
                   disabled={tricks[id] >= round.cardsDealt}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-card text-white disabled:opacity-20"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] text-white transition-all hover:bg-white/[0.1] active:scale-95 disabled:opacity-20"
                 >
                   <Plus size={14} />
                 </button>
@@ -98,15 +106,15 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
       <div className="mt-4 flex gap-3">
         <button
           onClick={() => reviseBid(gameId, round.bidOrder[0])}
-          className="flex items-center justify-center gap-1.5 rounded-xl bg-card px-4 py-3 text-sm font-medium text-text-secondary hover:bg-card-hover"
+          className="flex items-center justify-center gap-1.5 rounded-2xl bg-white/[0.05] px-4 py-3 text-sm font-medium text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
         >
           <ArrowLeft size={14} />
-          Revise Bids
+          Revise
         </button>
         <button
           onClick={handleSubmit}
           disabled={!isValid}
-          className="flex-1 rounded-xl bg-accent py-3 text-sm font-semibold text-white disabled:opacity-30"
+          className="flex-1 rounded-2xl gradient-accent py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-30"
         >
           Submit Tricks
         </button>

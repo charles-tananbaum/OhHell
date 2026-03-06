@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+import Avatar from '../shared/Avatar';
 import type { Round } from '../../types';
 
 interface RoundSummaryProps {
@@ -17,7 +18,7 @@ export default function RoundSummary({
   const players = useStore((s) => s.players);
 
   return (
-    <div className="rounded-2xl bg-card p-4">
+    <div className="rounded-2xl glass p-4">
       <h3 className="mb-3 text-sm font-semibold">
         Round {round.roundNumber} Summary
       </h3>
@@ -36,12 +37,12 @@ export default function RoundSummary({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="flex items-center justify-between rounded-xl bg-surface px-3 py-2.5"
+              className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2.5"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <div
-                  className={`flex h-6 w-6 items-center justify-center rounded-full ${
-                    hit ? 'bg-green/20' : 'bg-red/20'
+                  className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                    hit ? 'bg-green/15' : 'bg-red/15'
                   }`}
                 >
                   {hit ? (
@@ -50,9 +51,12 @@ export default function RoundSummary({
                     <X size={14} className="text-red" />
                   )}
                 </div>
+                <Avatar name={player?.name ?? '?'} size="sm" />
                 <span className="text-sm font-medium">{player?.name}</span>
                 {id === round.dealerPlayerId && (
-                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gold/20 text-[10px] font-bold text-gold">D</span>
+                  <span className="inline-flex h-4 items-center rounded-full bg-gold/15 px-1.5 text-[9px] font-bold text-gold">
+                    D
+                  </span>
                 )}
               </div>
               <div className="flex items-center gap-3">
@@ -63,8 +67,10 @@ export default function RoundSummary({
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: i * 0.1 + 0.2, type: 'spring' }}
-                  className={`text-sm font-bold ${
-                    hit ? 'text-green' : 'text-text-secondary'
+                  className={`flex h-7 min-w-[2rem] items-center justify-center rounded-lg text-sm font-bold ${
+                    hit
+                      ? 'bg-green/10 text-green'
+                      : 'bg-white/[0.04] text-text-secondary'
                   }`}
                 >
                   +{score}
@@ -77,7 +83,7 @@ export default function RoundSummary({
 
       <button
         onClick={onNext}
-        className="mt-4 w-full rounded-xl bg-accent py-3 text-sm font-semibold text-white"
+        className="mt-4 w-full rounded-2xl gradient-accent py-3 text-sm font-semibold text-white transition-all active:scale-[0.98]"
       >
         Next Round
       </button>

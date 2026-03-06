@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Send } from 'lucide-react';
+import { ChevronLeft, Send, Sparkles } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import Scoreboard from './Scoreboard';
 import GameNarratives from './GameNarratives';
@@ -17,7 +17,7 @@ export default function ActiveGame() {
 
   if (!game) {
     return (
-      <div className="py-16 text-center text-text-secondary">
+      <div className="py-20 text-center text-text-secondary">
         Game not found
       </div>
     );
@@ -40,14 +40,19 @@ export default function ActiveGame() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => navigate('/')}
-          className="rounded-lg bg-card p-2 text-text-secondary hover:bg-card-hover"
+          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
         >
           <ChevronLeft size={18} />
         </button>
-        <h1 className="text-xl font-bold">Game</h1>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Game</h1>
+          <p className="text-xs text-text-secondary">
+            Round {game.currentRoundIndex + 1} of {game.roundSequence.length}
+          </p>
+        </div>
       </div>
 
       <Scoreboard game={game} />
@@ -64,15 +69,18 @@ export default function ActiveGame() {
           animate={{ opacity: 1, y: 0 }}
           className="mt-4"
         >
-          <div className="rounded-2xl bg-card p-5 text-center">
-            <p className="mb-1 text-base font-semibold">All rounds complete!</p>
-            <p className="mb-4 text-sm text-text-secondary">
-              Review the scoreboard above, then submit the game to finalize
-              scores and update ELO ratings.
+          <div className="rounded-2xl glass p-6 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl gradient-green">
+              <Sparkles size={24} className="text-white" />
+            </div>
+            <p className="mb-1 text-base font-bold">All rounds complete!</p>
+            <p className="mb-5 text-sm text-text-secondary">
+              Review the scoreboard above, then submit to finalize scores and
+              update ELO ratings.
             </p>
             <button
               onClick={() => setShowConfirm(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-green py-3 font-semibold text-black"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl gradient-green py-3.5 font-semibold text-white transition-all active:scale-[0.98] glow-green"
             >
               <Send size={18} />
               Submit Game

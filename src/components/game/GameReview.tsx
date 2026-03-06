@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, Check, X } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { getPlacementsFromScores } from '../../lib/stats';
+import Avatar from '../shared/Avatar';
 
 export default function GameReview() {
   const { id } = useParams<{ id: string }>();
@@ -12,7 +13,7 @@ export default function GameReview() {
 
   if (!game) {
     return (
-      <div className="py-16 text-center text-text-secondary">
+      <div className="py-20 text-center text-text-secondary">
         Game not found
       </div>
     );
@@ -25,15 +26,15 @@ export default function GameReview() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => navigate('/')}
-          className="rounded-lg bg-card p-2 text-text-secondary hover:bg-card-hover"
+          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
         >
           <ChevronLeft size={18} />
         </button>
         <div>
-          <h1 className="text-xl font-bold">Game Review</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Game Review</h1>
           <p className="text-xs text-text-secondary">
             {new Date(game.date).toLocaleDateString()} ·{' '}
             {game.playerIds.map(getName).join(', ')}
@@ -43,8 +44,8 @@ export default function GameReview() {
 
       {/* Final scores */}
       {game.finalScores && (
-        <div className="mb-4 rounded-2xl bg-card p-4">
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+        <div className="mb-4 rounded-2xl glass p-4">
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
             Final Scores
           </h3>
           {(() => {
@@ -53,16 +54,17 @@ export default function GameReview() {
               (a, b) => placements[a] - placements[b],
             );
             return (
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {ranked.map((pid) => (
                   <div
                     key={pid}
-                    className="flex items-center justify-between rounded-lg bg-surface px-3 py-1.5"
+                    className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2"
                   >
-                    <span className="text-sm">
-                      <span className="mr-2 text-xs text-text-secondary">
+                    <span className="flex items-center gap-2.5 text-sm">
+                      <span className="text-xs font-bold text-text-secondary">
                         #{placements[pid]}
                       </span>
+                      <Avatar name={getName(pid)} size="sm" />
                       {getName(pid)}
                     </span>
                     <span className="text-sm font-bold">
@@ -77,20 +79,20 @@ export default function GameReview() {
       )}
 
       {/* Round-by-round */}
-      <div className="overflow-x-auto rounded-2xl bg-card">
+      <div className="overflow-x-auto rounded-2xl glass">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-separator">
-              <th className="px-3 py-2 text-left text-xs font-medium text-text-secondary">
+            <tr className="border-b border-white/[0.06]">
+              <th className="px-3 py-2.5 text-left text-xs font-medium text-text-secondary">
                 Rnd
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-text-secondary">
+              <th className="px-3 py-2.5 text-left text-xs font-medium text-text-secondary">
                 Cards
               </th>
               {game.playerIds.map((pid) => (
                 <th
                   key={pid}
-                  className="px-3 py-2 text-center text-xs font-medium text-text-secondary"
+                  className="px-3 py-2.5 text-center text-xs font-medium text-text-secondary"
                 >
                   {getName(pid)}
                 </th>
@@ -99,11 +101,11 @@ export default function GameReview() {
           </thead>
           <tbody>
             {completedRounds.map((round) => (
-              <tr key={round.roundNumber} className="border-b border-separator/50">
-                <td className="px-3 py-1.5 text-text-secondary">
+              <tr key={round.roundNumber} className="border-b border-white/[0.04]">
+                <td className="px-3 py-2 text-text-secondary">
                   {round.roundNumber}
                 </td>
-                <td className="px-3 py-1.5 text-text-secondary">
+                <td className="px-3 py-2 text-text-secondary">
                   {round.cardsDealt}
                 </td>
                 {game.playerIds.map((pid) => {
@@ -111,7 +113,7 @@ export default function GameReview() {
                   const tricks = round.tricksTaken[pid];
                   const hit = bid === tricks;
                   return (
-                    <td key={pid} className="px-3 py-1.5 text-center">
+                    <td key={pid} className="px-3 py-2 text-center">
                       <span
                         className={`inline-flex items-center gap-0.5 ${
                           hit ? 'text-green' : 'text-red'

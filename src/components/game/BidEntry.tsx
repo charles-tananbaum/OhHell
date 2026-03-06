@@ -3,6 +3,7 @@ import { clsx } from 'clsx';
 import { Pencil } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { getRestrictedBid } from '../../lib/gameLogic';
+import Avatar from '../shared/Avatar';
 import type { Round } from '../../types';
 
 interface BidEntryProps {
@@ -15,7 +16,6 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
   const submitBid = useStore((s) => s.submitBid);
   const reviseBid = useStore((s) => s.reviseBid);
 
-  // Find current bidder
   const currentBidderIndex = round.bidOrder.findIndex(
     (id) => !(id in round.bids),
   );
@@ -39,7 +39,7 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
   };
 
   return (
-    <div className="rounded-2xl bg-card p-4">
+    <div className="rounded-2xl glass p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold">
           Bidding · {round.cardsDealt} card{round.cardsDealt !== 1 ? 's' : ''}
@@ -59,19 +59,24 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
               key={id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="mb-1 flex items-center justify-between rounded-lg bg-surface px-3 py-1.5"
+              className="mb-1.5 flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2"
             >
-              <span className="flex items-center gap-1.5 text-sm text-text-secondary">
+              <span className="flex items-center gap-2 text-sm text-text-secondary">
+                <Avatar name={player?.name ?? '?'} size="sm" />
                 {player?.name}
                 {id === round.dealerPlayerId && (
-                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gold/20 text-[10px] font-bold text-gold">D</span>
+                  <span className="inline-flex h-4 items-center rounded-full bg-gold/15 px-1.5 text-[9px] font-bold text-gold">
+                    D
+                  </span>
                 )}
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold">{round.bids[id]}</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 text-sm font-bold text-accent-light">
+                  {round.bids[id]}
+                </span>
                 <button
                   onClick={() => handleRevise(id)}
-                  className="rounded p-0.5 text-text-secondary transition-colors hover:text-accent"
+                  className="rounded-lg p-1 text-text-secondary transition-colors hover:text-accent-light"
                   title="Revise bid"
                 >
                   <Pencil size={12} />
@@ -88,16 +93,19 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
           key={currentBidderId}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-3"
+          className="mt-4"
         >
-          <p className="mb-2 flex items-center justify-center gap-1.5 text-sm font-medium">
+          <p className="mb-3 flex items-center justify-center gap-2 text-sm font-semibold">
+            <Avatar name={currentPlayer?.name ?? '?'} size="sm" />
             {currentPlayer?.name}'s bid
             {currentBidderId === round.dealerPlayerId && (
-              <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gold/20 text-[10px] font-bold text-gold">D</span>
+              <span className="inline-flex h-4 items-center rounded-full bg-gold/15 px-1.5 text-[9px] font-bold text-gold">
+                D
+              </span>
             )}
           </p>
           {restrictedBid !== null && (
-            <p className="mb-2 text-center text-xs text-red">
+            <p className="mb-3 text-center text-xs text-red">
               Cannot bid {restrictedBid} (would make total = cards dealt)
             </p>
           )}
@@ -106,19 +114,20 @@ export default function BidEntry({ gameId, round }: BidEntryProps) {
               (n) => {
                 const isRestricted = restrictedBid === n;
                 return (
-                  <button
+                  <motion.button
                     key={n}
                     onClick={() => handleBid(n)}
                     disabled={isRestricted}
+                    whileTap={{ scale: 0.9 }}
                     className={clsx(
-                      'flex h-11 w-11 items-center justify-center rounded-xl text-sm font-bold transition-all',
+                      'flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-bold transition-all',
                       isRestricted
-                        ? 'bg-red/10 text-red/40 cursor-not-allowed'
-                        : 'bg-surface text-white hover:bg-accent hover:scale-105 active:scale-95',
+                        ? 'bg-red/10 text-red/30 cursor-not-allowed ring-1 ring-red/10'
+                        : 'bg-white/[0.05] text-white ring-1 ring-white/[0.06] hover:ring-accent/50 hover:bg-accent/10 hover:text-accent-light',
                     )}
                   >
                     {n}
-                  </button>
+                  </motion.button>
                 );
               },
             )}

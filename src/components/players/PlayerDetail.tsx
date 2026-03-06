@@ -5,6 +5,7 @@ import { useStore } from '../../store/useStore';
 import { computeDisplayStats } from '../../lib/stats';
 import EloChart from './EloChart';
 import PlayerAnalysis from './PlayerAnalysis';
+import Avatar from '../shared/Avatar';
 
 export default function PlayerDetail() {
   const { id } = useParams<{ id: string }>();
@@ -14,7 +15,7 @@ export default function PlayerDetail() {
 
   if (!player) {
     return (
-      <div className="py-16 text-center text-text-secondary">
+      <div className="py-20 text-center text-text-secondary">
         Player not found
       </div>
     );
@@ -25,24 +26,34 @@ export default function PlayerDetail() {
     .filter((g) => g.playerIds.includes(player.id))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  const statCards = [
+    { label: 'Games Played', value: display.gamesPlayed, icon: BarChart3 },
+    { label: 'Games Won', value: display.gamesWon, icon: Trophy },
+    { label: 'Avg Bid', value: display.avgBid, icon: Target },
+    { label: 'Bid Accuracy', value: display.bidAccuracy, icon: Target },
+    { label: 'Avg Placement', value: display.avgPlacement, icon: BarChart3 },
+    { label: 'ELO', value: display.elo, icon: Trophy },
+  ];
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => navigate('/players')}
-          className="rounded-lg bg-card p-2 text-text-secondary hover:bg-card-hover"
+          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
         >
           <ChevronLeft size={18} />
         </button>
+        <Avatar name={player.name} size="lg" />
         <div>
-          <h1 className="text-xl font-bold">{player.name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{player.name}</h1>
           <p className="text-xs text-text-secondary">ELO {player.elo}</p>
         </div>
       </div>
 
       {/* ELO Chart */}
       <div className="mb-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
           ELO History
         </h3>
         <EloChart history={player.eloHistory} />
@@ -50,29 +61,28 @@ export default function PlayerDetail() {
 
       {/* Stats grid */}
       <div className="mb-4 grid grid-cols-2 gap-2">
-        {[
-          { label: 'Games Played', value: display.gamesPlayed, icon: BarChart3 },
-          { label: 'Games Won', value: display.gamesWon, icon: Trophy },
-          { label: 'Avg Bid', value: display.avgBid, icon: Target },
-          { label: 'Bid Accuracy', value: display.bidAccuracy, icon: Target },
-          { label: 'Avg Placement', value: display.avgPlacement, icon: BarChart3 },
-          { label: 'ELO', value: display.elo, icon: Trophy },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-xl bg-card p-3">
-            <div className="mb-1 flex items-center gap-1.5">
+        {statCards.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="rounded-2xl glass p-3.5"
+          >
+            <div className="mb-1.5 flex items-center gap-1.5">
               <stat.icon size={12} className="text-text-secondary" />
-              <span className="text-[10px] text-text-secondary">
+              <span className="text-[10px] font-medium text-text-secondary">
                 {stat.label}
               </span>
             </div>
-            <span className="text-lg font-bold">{stat.value}</span>
-          </div>
+            <span className="text-xl font-bold">{stat.value}</span>
+          </motion.div>
         ))}
       </div>
 
       {/* Player Analysis */}
       <div className="mb-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
           Scouting Report
         </h3>
         <PlayerAnalysis analysis={player.analysis} />
@@ -80,13 +90,13 @@ export default function PlayerDetail() {
 
       {/* Game history */}
       <div>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
           Game History
         </h3>
         {playerGames.length === 0 ? (
           <p className="text-sm text-text-secondary">No games yet</p>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {playerGames.map((game) => (
               <Link
                 key={game.id}
@@ -95,12 +105,12 @@ export default function PlayerDetail() {
                     ? `/games/${game.id}/review`
                     : `/games/${game.id}`
                 }
-                className="flex items-center justify-between rounded-xl bg-card px-3 py-2 hover:bg-card-hover"
+                className="flex items-center justify-between rounded-xl glass px-3 py-2.5 transition-all hover:bg-white/[0.06]"
               >
                 <span className="text-xs text-text-secondary">
                   {new Date(game.date).toLocaleDateString()}
                 </span>
-                <span className="text-xs font-medium">
+                <span className="text-xs font-semibold">
                   {game.status === 'completed' && game.finalScores
                     ? `${game.finalScores[player.id]} pts`
                     : 'In progress'}

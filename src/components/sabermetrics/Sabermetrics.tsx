@@ -122,7 +122,7 @@ export default function Sabermetrics() {
   if (players.length === 0) {
     return (
       <div>
-        <h1 className="mb-4 text-xl font-bold">Sabermetrics</h1>
+        <h1 className="mb-6 text-2xl font-bold tracking-tight">Sabermetrics</h1>
         <EmptyState
           icon={BarChart3}
           title="No player data"
@@ -134,12 +134,12 @@ export default function Sabermetrics() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">Sabermetrics</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight">Sabermetrics</h1>
         {userRole === 'admin' && (
           <button
             onClick={recalculateAllElo}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent/20"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-accent/10 px-3 py-2 text-xs font-semibold text-accent-light transition-all hover:bg-accent/20"
           >
             <RefreshCw size={14} />
             Recalculate ELO
@@ -149,20 +149,20 @@ export default function Sabermetrics() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto rounded-2xl bg-card"
+        className="overflow-x-auto rounded-2xl glass"
       >
         <table className="w-full min-w-[600px] text-sm">
           <thead>
-            <tr className="border-b border-separator">
+            <tr className="border-b border-white/[0.06]">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   title={col.title}
                   onClick={() => handleSort(col.key)}
                   className={clsx(
-                    'cursor-pointer select-none whitespace-nowrap px-3 py-3 text-left font-medium text-text-secondary transition-colors hover:text-white',
+                    'cursor-pointer select-none whitespace-nowrap px-3 py-3.5 text-left font-medium text-text-secondary transition-colors hover:text-white',
                     col.key !== 'name' && 'text-right',
-                    sortKey === col.key && 'text-accent',
+                    sortKey === col.key && 'text-accent-light',
                   )}
                 >
                   <span className="inline-flex items-center gap-1">
@@ -185,13 +185,13 @@ export default function Sabermetrics() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.03 }}
-                className="border-b border-separator last:border-0"
+                className="border-b border-white/[0.04] last:border-0 transition-colors hover:bg-white/[0.02]"
               >
                 {columns.map((col) => (
                   <td
                     key={col.key}
                     className={clsx(
-                      'whitespace-nowrap px-3 py-2.5',
+                      'whitespace-nowrap px-3 py-3',
                       col.key === 'name' ? 'font-semibold' : 'text-right',
                     )}
                   >

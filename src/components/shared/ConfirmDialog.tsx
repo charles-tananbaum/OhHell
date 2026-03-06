@@ -21,11 +21,13 @@ export default function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Modal open={open} onClose={onClose} title={title}>
-      <p className="mb-5 text-sm text-text-secondary">{message}</p>
+      <p className="mb-6 text-sm leading-relaxed text-text-secondary">
+        {message}
+      </p>
       <div className="flex gap-3">
         <button
           onClick={onClose}
-          className="flex-1 rounded-xl bg-card py-2.5 text-sm font-medium text-white hover:bg-card-hover"
+          className="flex-1 rounded-2xl bg-white/[0.05] py-3 text-sm font-medium text-white transition-colors hover:bg-white/[0.08]"
         >
           Cancel
         </button>
@@ -34,8 +36,10 @@ export default function ConfirmDialog({
             onConfirm();
             onClose();
           }}
-          className={`flex-1 rounded-xl py-2.5 text-sm font-semibold text-white ${
-            destructive ? 'bg-red hover:opacity-90' : 'bg-accent hover:opacity-90'
+          className={`flex-1 rounded-2xl py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] ${
+            destructive
+              ? 'gradient-red hover:opacity-90'
+              : 'gradient-accent hover:opacity-90'
           }`}
         >
           {confirmLabel}

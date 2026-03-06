@@ -8,11 +8,13 @@ import {
   ArrowDown,
   Check,
   UserPlus,
+  Sparkles,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useStore } from '../../store/useStore';
 import { generateRoundSequence } from '../../lib/gameLogic';
 import PlayerForm from '../players/PlayerForm';
+import Avatar from '../shared/Avatar';
 
 type Step = 'select' | 'order' | 'settings';
 
@@ -57,35 +59,43 @@ export default function NewGame() {
   };
 
   const roundCount = generateRoundSequence(maxCards).length;
+  const stepIndex = ['select', 'order', 'settings'].indexOf(step);
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => {
             if (step === 'select') navigate('/');
             else if (step === 'order') setStep('select');
             else setStep('order');
           }}
-          className="rounded-lg bg-card p-2 text-text-secondary hover:bg-card-hover"
+          className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
         >
           <ChevronLeft size={18} />
         </button>
-        <h1 className="text-xl font-bold">New Game</h1>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">New Game</h1>
+          <p className="text-xs text-text-secondary">
+            Step {stepIndex + 1} of 3
+          </p>
+        </div>
       </div>
 
-      {/* Progress */}
-      <div className="mb-6 flex gap-1">
+      {/* Progress bar */}
+      <div className="mb-6 flex gap-1.5">
         {(['select', 'order', 'settings'] as const).map((s, i) => (
           <div
             key={s}
-            className={clsx(
-              'h-1 flex-1 rounded-full transition-colors',
-              (['select', 'order', 'settings'] as const).indexOf(step) >= i
-                ? 'bg-accent'
-                : 'bg-card',
-            )}
-          />
+            className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.06]"
+          >
+            <motion.div
+              className="h-full rounded-full gradient-accent"
+              initial={{ width: 0 }}
+              animate={{ width: stepIndex >= i ? '100%' : '0%' }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
         ))}
       </div>
 
@@ -103,7 +113,7 @@ export default function NewGame() {
               </p>
               <button
                 onClick={() => setShowAddPlayer(true)}
-                className="flex items-center gap-1 text-xs font-medium text-accent"
+                className="flex items-center gap-1.5 rounded-xl bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent-light transition-colors hover:bg-accent/20"
               >
                 <UserPlus size={14} />
                 Add New
@@ -111,45 +121,60 @@ export default function NewGame() {
             </div>
 
             {players.length === 0 ? (
-              <div className="rounded-2xl bg-card p-8 text-center">
+              <div className="rounded-2xl glass p-10 text-center">
                 <p className="text-sm text-text-secondary">
                   No players yet. Add some to get started.
                 </p>
                 <button
                   onClick={() => setShowAddPlayer(true)}
-                  className="mt-3 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
+                  className="mt-4 rounded-xl gradient-accent px-5 py-2.5 text-sm font-semibold text-white"
                 >
                   Add Player
                 </button>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2">
-                {players.map((player) => (
-                  <button
-                    key={player.id}
-                    onClick={() => togglePlayer(player.id)}
-                    className={clsx(
-                      'flex items-center gap-2 rounded-xl p-3 text-left transition-colors',
-                      selectedIds.includes(player.id)
-                        ? 'bg-accent/15 ring-1 ring-accent'
-                        : 'bg-card hover:bg-card-hover',
-                    )}
-                  >
-                    {selectedIds.includes(player.id) && (
-                      <Check size={14} className="text-accent" />
-                    )}
-                    <span className="truncate text-sm font-medium">
-                      {player.name}
-                    </span>
-                  </button>
-                ))}
+                {players.map((player) => {
+                  const selected = selectedIds.includes(player.id);
+                  return (
+                    <motion.button
+                      key={player.id}
+                      onClick={() => togglePlayer(player.id)}
+                      whileTap={{ scale: 0.97 }}
+                      className={clsx(
+                        'flex items-center gap-2.5 rounded-2xl p-3 text-left transition-all',
+                        selected
+                          ? 'bg-accent/10 ring-1 ring-accent/40 glow-accent'
+                          : 'glass hover:bg-white/[0.06]',
+                      )}
+                    >
+                      <Avatar name={player.name} size="md" />
+                      <div className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium">
+                          {player.name}
+                        </span>
+                        <span className="text-[10px] text-text-secondary">
+                          ELO {player.elo}
+                        </span>
+                      </div>
+                      {selected && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                        >
+                          <Check size={16} className="text-accent-light" />
+                        </motion.div>
+                      )}
+                    </motion.button>
+                  );
+                })}
               </div>
             )}
 
             <button
               onClick={goToOrder}
               disabled={selectedIds.length < 2}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3 font-semibold text-white disabled:opacity-30"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl gradient-accent py-3.5 font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-30"
             >
               Next
               <ChevronRight size={18} />
@@ -178,25 +203,26 @@ export default function NewGame() {
                   <motion.div
                     key={id}
                     layout
-                    className="flex items-center gap-2 rounded-xl bg-card p-3"
+                    className="flex items-center gap-3 rounded-2xl glass p-3"
                   >
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface text-xs font-bold text-text-secondary">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.08] text-xs font-bold text-text-secondary">
                       {i + 1}
                     </span>
+                    <Avatar name={player?.name ?? ''} size="sm" />
                     <span className="flex-1 text-sm font-medium">
                       {player?.name}
                     </span>
                     <button
                       onClick={() => movePlayer(i, -1)}
                       disabled={i === 0}
-                      className="rounded-lg p-1 text-text-secondary hover:bg-surface disabled:opacity-20"
+                      className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-white/[0.08] disabled:opacity-20"
                     >
                       <ArrowUp size={16} />
                     </button>
                     <button
                       onClick={() => movePlayer(i, 1)}
                       disabled={i === orderedIds.length - 1}
-                      className="rounded-lg p-1 text-text-secondary hover:bg-surface disabled:opacity-20"
+                      className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-white/[0.08] disabled:opacity-20"
                     >
                       <ArrowDown size={16} />
                     </button>
@@ -207,7 +233,7 @@ export default function NewGame() {
 
             <button
               onClick={goToSettings}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3 font-semibold text-white"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl gradient-accent py-3.5 font-semibold text-white transition-all active:scale-[0.98]"
             >
               Next
               <ChevronRight size={18} />
@@ -223,33 +249,33 @@ export default function NewGame() {
             exit={{ opacity: 0, x: 20 }}
           >
             <div className="space-y-4">
-              <div className="rounded-2xl bg-card p-4">
-                <label className="mb-2 block text-sm text-text-secondary">
+              <div className="rounded-2xl glass p-5">
+                <label className="mb-3 block text-sm font-medium text-text-secondary">
                   Max cards per round
                 </label>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <input
                     type="range"
                     min={1}
                     max={20}
                     value={maxCards}
                     onChange={(e) => setMaxCards(Number(e.target.value))}
-                    className="flex-1 accent-accent"
+                    className="flex-1"
                   />
-                  <span className="w-8 text-center text-lg font-bold">
+                  <span className="flex h-10 w-12 items-center justify-center rounded-xl bg-accent/10 text-lg font-bold text-accent-light">
                     {maxCards}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-text-secondary">
-                  {roundCount} total rounds (1→{maxCards}→1)
+                <p className="mt-2 text-xs text-text-secondary">
+                  {roundCount} total rounds (1 → {maxCards} → 1)
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-card p-4">
-                <label className="mb-2 block text-sm text-text-secondary">
+              <div className="rounded-2xl glass p-5">
+                <label className="mb-3 block text-sm font-medium text-text-secondary">
                   First dealer
                 </label>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {orderedIds.map((id, i) => {
                     const player = players.find((p) => p.id === id);
                     return (
@@ -257,12 +283,13 @@ export default function NewGame() {
                         key={id}
                         onClick={() => setDealerIndex(i)}
                         className={clsx(
-                          'flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors',
+                          'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all',
                           dealerIndex === i
-                            ? 'bg-accent/15 font-semibold text-accent'
-                            : 'text-text-secondary hover:text-white',
+                            ? 'bg-accent/10 font-semibold text-accent-light ring-1 ring-accent/30'
+                            : 'text-text-secondary hover:bg-white/[0.04] hover:text-white',
                         )}
                       >
+                        <Avatar name={player?.name ?? ''} size="sm" />
                         {dealerIndex === i && <Check size={14} />}
                         <span>{player?.name}</span>
                       </button>
@@ -271,9 +298,9 @@ export default function NewGame() {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-card p-4">
+              <div className="rounded-2xl glass p-4">
                 <p className="text-xs text-text-secondary">Scoring</p>
-                <p className="text-sm font-medium">
+                <p className="mt-0.5 text-sm font-medium">
                   Exact bid = 10 + tricks · Miss = tricks taken
                 </p>
               </div>
@@ -281,10 +308,10 @@ export default function NewGame() {
 
             <button
               onClick={handleStart}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-green py-3 font-semibold text-black"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl gradient-green py-3.5 font-semibold text-white transition-all active:scale-[0.98] glow-green"
             >
+              <Sparkles size={18} />
               Start Game
-              <Check size={18} />
             </button>
           </motion.div>
         )}

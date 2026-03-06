@@ -64,26 +64,31 @@ export default function GameList() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">Games</h1>
-        <div className="flex gap-2">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Games</h1>
+          <p className="mt-0.5 text-sm text-text-secondary">
+            {games.length} total
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
           <button
             onClick={handleImport}
-            className="rounded-lg bg-card p-2 text-text-secondary hover:bg-card-hover"
+            className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
             title="Import"
           >
             <Upload size={16} />
           </button>
           <button
             onClick={handleExport}
-            className="rounded-lg bg-card p-2 text-text-secondary hover:bg-card-hover"
+            className="rounded-xl bg-white/[0.05] p-2.5 text-text-secondary transition-all hover:bg-white/[0.08] hover:text-white"
             title="Export"
           >
             <Download size={16} />
           </button>
           <Link
             to="/games/new"
-            className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-white"
+            className="flex items-center gap-1.5 rounded-xl gradient-accent px-4 py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90 active:scale-[0.97]"
           >
             <Plus size={14} />
             New Game
@@ -91,18 +96,25 @@ export default function GameList() {
         </div>
       </div>
 
-      <div className="mb-4 flex gap-1 rounded-xl bg-card p-1">
+      <div className="mb-5 flex gap-1 rounded-2xl bg-white/[0.03] p-1 ring-1 ring-white/[0.06]">
         {(['all', 'active', 'completed'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`flex-1 rounded-lg py-1.5 text-xs font-medium capitalize transition-colors ${
+            className={`relative flex-1 rounded-xl py-2 text-xs font-medium capitalize transition-colors ${
               filter === f
-                ? 'bg-accent/15 text-accent'
+                ? 'text-white'
                 : 'text-text-secondary hover:text-white'
             }`}
           >
-            {f}
+            {filter === f && (
+              <motion.div
+                layoutId="game-filter"
+                className="absolute inset-0 rounded-xl bg-white/[0.08]"
+                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+              />
+            )}
+            <span className="relative">{f}</span>
           </button>
         ))}
       </div>
@@ -115,7 +127,7 @@ export default function GameList() {
           action={
             <Link
               to="/games/new"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
+              className="inline-flex items-center gap-1.5 rounded-xl gradient-accent px-5 py-2.5 text-sm font-semibold text-white"
             >
               <Plus size={16} />
               New Game
@@ -123,7 +135,7 @@ export default function GameList() {
           }
         />
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           <AnimatePresence>
             {filtered.map((game, i) => (
               <motion.div
@@ -140,28 +152,37 @@ export default function GameList() {
                         : `/games/${game.id}/review`,
                     )
                   }
-                  className="group cursor-pointer rounded-2xl bg-card p-4 transition-colors hover:bg-card-hover"
+                  className="group cursor-pointer rounded-2xl glass p-4 transition-all hover:bg-white/[0.06]"
                 >
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
-                      <div className="mb-1 flex items-center gap-2">
+                      <div className="mb-1.5 flex items-center gap-2">
                         {game.status === 'active' ? (
-                          <Clock size={14} className="text-gold" />
+                          <div className="flex items-center gap-1.5 rounded-full bg-gold/10 px-2 py-0.5">
+                            <Clock size={12} className="text-gold" />
+                            <span className="text-[10px] font-medium text-gold">
+                              Active
+                            </span>
+                          </div>
                         ) : (
-                          <CheckCircle size={14} className="text-green" />
+                          <div className="flex items-center gap-1.5 rounded-full bg-green/10 px-2 py-0.5">
+                            <CheckCircle size={12} className="text-green" />
+                            <span className="text-[10px] font-medium text-green">
+                              Complete
+                            </span>
+                          </div>
                         )}
-                        <span className="text-xs text-text-secondary">
-                          {new Date(game.date).toLocaleDateString()} ·{' '}
-                          {game.roundSequence.length} rounds
+                        <span className="text-[10px] text-text-secondary">
+                          {new Date(game.date).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="truncate text-sm font-medium">
+                      <p className="truncate text-sm font-semibold">
                         {getPlayerNames(game.playerIds)}
                       </p>
                       <p className="mt-0.5 text-xs text-text-secondary">
                         {game.status === 'active'
                           ? `Round ${game.currentRoundIndex + 1} of ${game.roundSequence.length}`
-                          : 'Completed'}
+                          : `${game.roundSequence.length} rounds`}
                       </p>
                     </div>
                     {userRole === 'admin' && (
@@ -170,7 +191,7 @@ export default function GameList() {
                           e.stopPropagation();
                           setDeleteId(game.id);
                         }}
-                        className="rounded-lg p-1.5 text-text-secondary opacity-0 transition-opacity hover:bg-surface hover:text-red group-hover:opacity-100"
+                        className="rounded-xl p-2 text-text-secondary opacity-0 transition-all hover:bg-red/10 hover:text-red group-hover:opacity-100"
                       >
                         <Trash2 size={14} />
                       </button>

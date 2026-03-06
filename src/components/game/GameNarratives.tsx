@@ -16,7 +16,7 @@ export default function GameNarratives({ game }: GameNarrativesProps) {
   if (narratives.length === 0) return null;
 
   return (
-    <div className="mt-2 space-y-1.5">
+    <div className="mt-3 space-y-2">
       <AnimatePresence mode="popLayout">
         {narratives.map((n, i) => (
           <motion.div
@@ -25,10 +25,10 @@ export default function GameNarratives({ game }: GameNarrativesProps) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ delay: i * 0.1 }}
-            className="flex items-start gap-2 rounded-xl bg-accent/10 border border-accent/20 px-3 py-2"
+            className="flex items-start gap-2.5 rounded-2xl bg-accent/[0.06] border border-accent/15 px-4 py-2.5"
           >
             <span className="mt-0.5 text-sm leading-none">{n.emoji}</span>
-            <p className="text-xs font-medium text-text-primary leading-relaxed">
+            <p className="text-xs font-medium leading-relaxed text-text-primary">
               {n.text}
             </p>
           </motion.div>

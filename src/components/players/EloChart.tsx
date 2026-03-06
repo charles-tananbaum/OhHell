@@ -8,7 +8,7 @@ interface EloChartProps {
 export default function EloChart({ history }: EloChartProps) {
   if (history.length === 0) {
     return (
-      <div className="flex h-32 items-center justify-center rounded-xl bg-surface text-xs text-text-secondary">
+      <div className="flex h-36 items-center justify-center rounded-2xl glass text-xs text-text-secondary">
         No ELO history yet
       </div>
     );
@@ -25,8 +25,8 @@ export default function EloChart({ history }: EloChartProps) {
   const range = maxElo - minElo || 1;
 
   const width = 300;
-  const height = 100;
-  const padding = 10;
+  const height = 120;
+  const padding = 12;
   const innerW = width - padding * 2;
   const innerH = height - padding * 2;
 
@@ -39,36 +39,56 @@ export default function EloChart({ history }: EloChartProps) {
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${getX(i)},${getY(p.elo)}`)
     .join(' ');
 
+  // Gradient fill area
+  const areaData =
+    pathData +
+    ` L${getX(points.length - 1)},${height - padding} L${padding},${height - padding} Z`;
+
   const lastElo = points[points.length - 1].elo;
   const firstElo = points[0].elo;
-  const color = lastElo >= firstElo ? '#30d158' : '#ff453a';
+  const isUp = lastElo >= firstElo;
+  const strokeColor = isUp ? '#34d399' : '#f87171';
+  const gradientId = isUp ? 'elo-grad-up' : 'elo-grad-down';
 
   return (
-    <div className="rounded-xl bg-surface p-3">
+    <div className="rounded-2xl glass p-4">
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="w-full"
         preserveAspectRatio="none"
       >
+        <defs>
+          <linearGradient id="elo-grad-up" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#34d399" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="elo-grad-down" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f87171" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#f87171" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={areaData} fill={`url(#${gradientId})`} />
         <path
           d={pathData}
           fill="none"
-          stroke={color}
+          stroke={strokeColor}
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {/* Dots at endpoints */}
-        <circle cx={getX(0)} cy={getY(firstElo)} r={3} fill={color} />
+        <circle cx={getX(0)} cy={getY(firstElo)} r={3} fill={strokeColor} />
         <circle
           cx={getX(points.length - 1)}
           cy={getY(lastElo)}
-          r={3}
-          fill={color}
+          r={4}
+          fill={strokeColor}
+          stroke="#09090b"
+          strokeWidth={2}
         />
       </svg>
       <div className="mt-1 flex justify-between text-[10px] text-text-secondary">
         <span>{minElo}</span>
+        <span className="font-semibold text-text-primary">{lastElo}</span>
         <span>{maxElo}</span>
       </div>
     </div>

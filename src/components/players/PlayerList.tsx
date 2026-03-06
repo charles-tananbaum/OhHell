@@ -6,6 +6,7 @@ import { useStore } from '../../store/useStore';
 import PlayerForm from './PlayerForm';
 import EmptyState from '../shared/EmptyState';
 import ConfirmDialog from '../shared/ConfirmDialog';
+import Avatar from '../shared/Avatar';
 
 export default function PlayerList() {
   const { players, deletePlayer, addToast, userRole } = useStore();
@@ -17,11 +18,16 @@ export default function PlayerList() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">Players</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Players</h1>
+          <p className="mt-0.5 text-sm text-text-secondary">
+            {players.length} registered
+          </p>
+        </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-white"
+          className="flex items-center gap-1.5 rounded-xl gradient-accent px-4 py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90 active:scale-[0.97]"
         >
           <Plus size={14} />
           Add Player
@@ -36,7 +42,7 @@ export default function PlayerList() {
           action={
             <button
               onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
+              className="inline-flex items-center gap-1.5 rounded-xl gradient-accent px-5 py-2.5 text-sm font-semibold text-white"
             >
               <Plus size={16} />
               Add Player
@@ -44,7 +50,7 @@ export default function PlayerList() {
           }
         />
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           <AnimatePresence>
             {sorted.map((player, i) => (
               <motion.div
@@ -55,13 +61,16 @@ export default function PlayerList() {
               >
                 <Link
                   to={`/players/${player.id}`}
-                  className="group flex items-center justify-between rounded-2xl bg-card p-4 transition-colors hover:bg-card-hover"
+                  className="group flex items-center justify-between rounded-2xl glass p-4 transition-all hover:bg-white/[0.06]"
                 >
-                  <div>
-                    <p className="text-sm font-semibold">{player.name}</p>
-                    <p className="text-xs text-text-secondary">
-                      ELO {player.elo} · {player.stats.gamesPlayed} games
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <Avatar name={player.name} size="lg" />
+                    <div>
+                      <p className="text-sm font-semibold">{player.name}</p>
+                      <p className="text-xs text-text-secondary">
+                        ELO {player.elo} · {player.stats.gamesPlayed} games
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-1">
                     <button
@@ -70,7 +79,7 @@ export default function PlayerList() {
                         e.stopPropagation();
                         setEditId(player.id);
                       }}
-                      className="rounded-lg p-1.5 text-text-secondary opacity-0 hover:bg-surface group-hover:opacity-100"
+                      className="rounded-xl p-2 text-text-secondary opacity-0 transition-all hover:bg-white/[0.05] group-hover:opacity-100"
                     >
                       <Pencil size={14} />
                     </button>
@@ -81,7 +90,7 @@ export default function PlayerList() {
                           e.stopPropagation();
                           setDeleteId(player.id);
                         }}
-                        className="rounded-lg p-1.5 text-text-secondary opacity-0 hover:bg-surface hover:text-red group-hover:opacity-100"
+                        className="rounded-xl p-2 text-text-secondary opacity-0 transition-all hover:bg-red/10 hover:text-red group-hover:opacity-100"
                       >
                         <Trash2 size={14} />
                       </button>
