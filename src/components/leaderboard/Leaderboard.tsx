@@ -6,7 +6,11 @@ import { useStore } from '../../store/useStore';
 import EmptyState from '../shared/EmptyState';
 import Avatar from '../shared/Avatar';
 
-const RANK_COLORS = ['text-gold', 'text-silver', 'text-bronze'];
+const RANK_STYLES = [
+  { text: 'text-gold', bg: 'bg-gold/8', border: 'border-gold/15' },
+  { text: 'text-silver', bg: 'bg-silver/8', border: 'border-silver/15' },
+  { text: 'text-bronze', bg: 'bg-bronze/8', border: 'border-bronze/15' },
+];
 
 export default function Leaderboard() {
   const players = useStore((s) => s.players);
@@ -20,7 +24,7 @@ export default function Leaderboard() {
   if (ranked.length === 0) {
     return (
       <div>
-        <h1 className="mb-6 font-display text-3xl font-bold tracking-tight text-ivory">Leaderboard</h1>
+        <h1 className="mb-8 font-display text-4xl tracking-tight text-ivory">Rankings</h1>
         <EmptyState
           icon={Trophy}
           title="No rankings yet"
@@ -32,84 +36,43 @@ export default function Leaderboard() {
 
   return (
     <div>
-      <h1 className="mb-6 font-display text-3xl font-bold tracking-tight text-ivory">Leaderboard</h1>
+      <h1 className="mb-6 font-display text-4xl tracking-tight text-ivory">Rankings</h1>
 
-      {/* Top 3 podium */}
+      {/* Champion card */}
       {ranked.length >= 1 && (
-        <div className="mb-6 flex items-end justify-center gap-3 px-2 pt-4">
-          {/* Second place */}
-          {ranked.length >= 2 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex flex-col items-center"
-            >
-              <Avatar name={ranked[1].name} size="lg" />
-              <span className="mt-1.5 text-xs font-bold text-silver">
-                {ranked[1].name}
-              </span>
-              <span className="font-display text-lg font-bold text-ivory">
-                {ranked[1].elo}
-              </span>
-              <div className="mt-1 flex h-16 w-20 items-center justify-center rounded-t-xl bg-silver/8 border-t border-x border-silver/15">
-                <span className="font-display text-2xl font-bold text-silver">2</span>
-              </div>
-            </motion.div>
-          )}
-
-          {/* First place */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative mb-6 overflow-hidden rounded-2xl border border-gold/12 bg-gold/[0.03] p-6"
+        >
+          <div className="absolute top-3 right-4">
+            <Crown size={32} className="text-gold/20" />
+          </div>
+          <div className="flex items-center gap-4">
             <div className="relative">
+              <Avatar name={ranked[0].name} size="xl" className="ring-2 ring-gold/20" />
               <motion.div
-                initial={{ scale: 0, rotate: -20 }}
-                animate={{ scale: 1, rotate: 0 }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="absolute -top-4 left-1/2 -translate-x-1/2"
+                className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full gradient-gold"
               >
-                <Crown size={20} className="text-gold" />
+                <Crown size={12} className="text-white" />
               </motion.div>
-              <Avatar name={ranked[0].name} size="xl" className="ring-2 ring-gold/25" />
             </div>
-            <span className="mt-1.5 text-sm font-bold text-gold">
-              {ranked[0].name}
-            </span>
-            <span className="font-display text-xl font-bold text-ivory">
-              {ranked[0].elo}
-            </span>
-            <div className="mt-1 flex h-24 w-20 items-center justify-center rounded-t-xl bg-gold/8 border-t border-x border-gold/15">
-              <Trophy size={28} className="text-gold" />
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-gold/60">#1 Ranked</p>
+              <p className="font-display text-2xl text-gold">{ranked[0].name}</p>
+              <p className="text-sm text-text-secondary">
+                <span className="font-display text-lg text-ivory">{ranked[0].elo}</span>
+                <span className="ml-1 text-text-muted">ELO</span>
+              </p>
             </div>
-          </motion.div>
-
-          {/* Third place */}
-          {ranked.length >= 3 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex flex-col items-center"
-            >
-              <Avatar name={ranked[2].name} size="lg" />
-              <span className="mt-1.5 text-xs font-bold text-bronze">
-                {ranked[2].name}
-              </span>
-              <span className="font-display text-lg font-bold text-ivory">
-                {ranked[2].elo}
-              </span>
-              <div className="mt-1 flex h-12 w-20 items-center justify-center rounded-t-xl bg-bronze/8 border-t border-x border-bronze/15">
-                <span className="font-display text-2xl font-bold text-bronze">3</span>
-              </div>
-            </motion.div>
-          )}
-        </div>
+          </div>
+        </motion.div>
       )}
 
-      {/* Full list */}
+      {/* Ranked list */}
       <div className="space-y-2">
         {ranked.map((player, i) => {
           const lastEntry =
@@ -117,23 +80,25 @@ export default function Leaderboard() {
           const recentChange = lastEntry
             ? lastEntry.eloAfter - lastEntry.eloBefore
             : 0;
+          const style = i < 3 ? RANK_STYLES[i] : null;
 
           return (
             <motion.div
               key={player.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.03 }}
+              transition={{ delay: i * 0.04, ease: [0.23, 1, 0.32, 1] }}
             >
               <Link
                 to={`/players/${player.id}`}
-                className="flex items-center justify-between rounded-2xl card-surface p-4 transition-all hover:card-surface-hover"
+                className="flex items-center justify-between rounded-xl card-surface p-4 transition-all duration-200 hover:card-surface-hover"
               >
                 <div className="flex items-center gap-3">
+                  {/* Rank number — oversized for top 3 */}
                   <span
-                    className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ${
-                      i < 3
-                        ? `${RANK_COLORS[i]} bg-separator`
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg font-display text-base ${
+                      style
+                        ? `${style.text} ${style.bg}`
                         : 'text-text-muted bg-separator/50'
                     }`}
                   >
@@ -143,16 +108,15 @@ export default function Leaderboard() {
                   <div>
                     <p className="text-sm font-semibold text-ivory">{player.name}</p>
                     <p className="text-[10px] text-text-secondary">
-                      {player.stats.gamesPlayed} games ·{' '}
-                      {player.stats.gamesWon} wins
+                      {player.stats.gamesPlayed} games · {player.stats.gamesWon} wins
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-display text-lg font-bold text-ivory">{player.elo}</p>
+                  <p className="font-display text-xl text-ivory">{player.elo}</p>
                   {recentChange !== 0 && (
                     <p
-                      className={`flex items-center justify-end gap-0.5 text-[10px] font-semibold ${
+                      className={`flex items-center justify-end gap-0.5 text-[10px] font-bold ${
                         recentChange > 0 ? 'text-green' : 'text-red'
                       }`}
                     >

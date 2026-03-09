@@ -20,7 +20,6 @@ export default function RoundFlow({ game }: RoundFlowProps) {
     if (!isLastRound) {
       advanceRound(game.id);
     }
-    // If last round, ActiveGame shows the Submit Game button instead
   };
 
   return (

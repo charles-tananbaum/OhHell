@@ -27,7 +27,7 @@ export default function ConfirmDialog({
       <div className="flex gap-3">
         <button
           onClick={onClose}
-          className="flex-1 rounded-2xl border border-separator py-3 text-sm font-medium text-ivory transition-colors hover:bg-separator"
+          className="flex-1 rounded-xl border border-separator py-3 text-sm font-semibold text-ivory transition-all hover:bg-separator"
         >
           Cancel
         </button>
@@ -36,7 +36,7 @@ export default function ConfirmDialog({
             onConfirm();
             onClose();
           }}
-          className={`flex-1 rounded-2xl py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] ${
+          className={`flex-1 rounded-xl py-3 text-sm font-bold text-white transition-all active:scale-[0.98] ${
             destructive
               ? 'gradient-red hover:opacity-90'
               : 'gradient-accent hover:opacity-90'

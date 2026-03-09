@@ -38,43 +38,42 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
   };
 
   return (
-    <div className="rounded-2xl card-surface p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-display text-base font-semibold text-ivory">
-          Tricks · {round.cardsDealt} card{round.cardsDealt !== 1 ? 's' : ''}
-        </h3>
+    <div className="rounded-xl card-surface overflow-hidden">
+      {/* Header bar */}
+      <div className="flex items-center justify-between border-b border-separator px-5 py-3">
+        <h3 className="text-sm font-bold text-ivory">Tricks Taken</h3>
         <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+          className={`rounded-full px-3 py-0.5 text-xs font-bold ${
             isValid
               ? 'bg-green/10 text-green'
-              : 'border border-separator text-text-secondary'
+              : 'bg-surface text-text-secondary'
           }`}
         >
           {total} / {round.cardsDealt}
         </span>
       </div>
 
-      <div className="space-y-2">
+      <div className="p-5 space-y-2.5">
         {playerIds.map((id) => {
           const player = players.find((p) => p.id === id);
           const bid = round.bids[id];
           return (
             <motion.div
               key={id}
-              initial={{ opacity: 0, y: 5 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between rounded-xl bg-separator/50 px-3 py-2.5"
+              className="flex items-center justify-between rounded-lg bg-surface/60 px-3.5 py-2.5"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <Avatar name={player?.name ?? '?'} size="sm" />
                 <div>
                   <span className="text-sm font-medium text-ivory">{player?.name}</span>
                   {id === round.dealerPlayerId && (
-                    <span className="ml-1.5 inline-flex h-4 items-center rounded-full bg-gold/15 px-1.5 text-[9px] font-bold text-gold">
+                    <span className="ml-1.5 inline-flex h-4 items-center rounded bg-amber/10 px-1.5 text-[9px] font-bold text-amber">
                       D
                     </span>
                   )}
-                  <span className="ml-2 text-xs text-text-muted">
+                  <span className="ml-2 text-[10px] text-text-muted">
                     bid {bid}
                   </span>
                 </div>
@@ -83,17 +82,17 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
                 <button
                   onClick={() => updateTrick(id, -1)}
                   disabled={tricks[id] <= 0}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-20"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-20"
                 >
                   <Minus size={14} />
                 </button>
-                <span className="flex h-9 w-9 items-center justify-center text-sm font-bold text-ivory">
+                <span className="flex h-9 w-9 items-center justify-center font-bold text-ivory">
                   {tricks[id]}
                 </span>
                 <button
                   onClick={() => updateTrick(id, 1)}
                   disabled={tricks[id] >= round.cardsDealt}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-20"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-20"
                 >
                   <Plus size={14} />
                 </button>
@@ -103,10 +102,10 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
         })}
       </div>
 
-      <div className="mt-4 flex gap-3">
+      <div className="flex gap-3 border-t border-separator px-5 py-4">
         <button
           onClick={() => reviseBid(gameId, round.bidOrder[0])}
-          className="flex items-center justify-center gap-1.5 rounded-2xl border border-separator px-4 py-3 text-sm font-medium text-text-secondary transition-all hover:bg-separator hover:text-ivory"
+          className="flex items-center justify-center gap-1.5 rounded-xl border border-separator px-4 py-2.5 text-sm font-medium text-text-secondary transition-all hover:bg-separator hover:text-ivory"
         >
           <ArrowLeft size={14} />
           Revise
@@ -114,7 +113,7 @@ export default function TrickEntry({ gameId, round, playerIds }: TrickEntryProps
         <button
           onClick={handleSubmit}
           disabled={!isValid}
-          className="flex-1 rounded-2xl gradient-accent py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-30"
+          className="flex-1 rounded-xl gradient-accent py-2.5 text-sm font-bold text-white transition-all active:scale-[0.98] disabled:opacity-25"
         >
           Submit Tricks
         </button>

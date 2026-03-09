@@ -40,18 +40,22 @@ export default function ActiveGame() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      {/* Header */}
       <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => navigate('/')}
-          className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
+          className="rounded-lg border border-separator p-2 text-text-secondary transition-all hover:border-accent/20 hover:text-ivory"
         >
           <ChevronLeft size={18} />
         </button>
-        <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Game</h1>
-          <p className="text-xs text-text-secondary">
-            Round {game.currentRoundIndex + 1} of {game.roundSequence.length}
-          </p>
+        <div className="flex-1">
+          <h1 className="font-display text-3xl tracking-tight text-ivory">Live Game</h1>
+        </div>
+        <div className="flex items-center gap-1.5 rounded-full bg-amber/10 px-3 py-1">
+          <div className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse-glow" />
+          <span className="text-[10px] font-bold text-amber uppercase tracking-wider">
+            Round {game.currentRoundIndex + 1}/{game.roundSequence.length}
+          </span>
         </div>
       </div>
 
@@ -65,24 +69,23 @@ export default function ActiveGame() {
 
       {allRoundsComplete && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           className="mt-4"
         >
-          <div className="rounded-2xl card-surface p-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl gradient-gold">
+          <div className="rounded-xl card-surface p-6 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full gradient-gold animate-float">
               <Sparkles size={24} className="text-white" />
             </div>
-            <p className="mb-1 font-display text-lg font-bold text-ivory">All rounds complete!</p>
-            <p className="mb-5 text-sm text-text-secondary">
-              Review the scoreboard above, then submit to finalize scores and
-              update ELO ratings.
+            <p className="mb-1.5 font-display text-xl text-ivory">All rounds complete!</p>
+            <p className="mb-6 text-sm text-text-secondary">
+              Submit to finalize scores and update ELO ratings.
             </p>
             <button
               onClick={() => setShowConfirm(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl gradient-accent py-3.5 font-semibold text-white transition-all active:scale-[0.98] glow-accent"
+              className="flex w-full items-center justify-center gap-2 rounded-xl gradient-accent py-3.5 font-bold text-white transition-all active:scale-[0.98] glow-accent"
             >
-              <Send size={18} />
+              <Send size={16} />
               Submit Game
             </button>
           </div>

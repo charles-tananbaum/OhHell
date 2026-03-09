@@ -68,59 +68,74 @@ export default function GameList() {
     input.click();
   };
 
+  const counts = useMemo(() => ({
+    all: games.length,
+    active: games.filter((g) => g.status === 'active').length,
+    completed: games.filter((g) => g.status === 'completed').length,
+  }), [games]);
+
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Games</h1>
-          <p className="mt-0.5 text-sm text-text-secondary">
-            {games.length} total
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleImport}
-            className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
-            title="Import"
-          >
-            <Upload size={16} />
-          </button>
-          <button
-            onClick={handleExport}
-            className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
-            title="Export"
-          >
-            <Download size={16} />
-          </button>
-          <Link
-            to="/games/new"
-            className="flex items-center gap-1.5 rounded-xl gradient-accent px-4 py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90 active:scale-[0.97]"
-          >
-            <Plus size={14} />
-            New Game
-          </Link>
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="font-display text-4xl tracking-tight text-ivory">Games</h1>
+            <p className="mt-1 text-xs text-text-secondary tracking-wide">
+              {games.length} total · {counts.active} live
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleImport}
+              className="rounded-lg border border-separator p-2 text-text-muted transition-all hover:border-accent/20 hover:text-ivory"
+              title="Import"
+            >
+              <Upload size={14} />
+            </button>
+            <button
+              onClick={handleExport}
+              className="rounded-lg border border-separator p-2 text-text-muted transition-all hover:border-accent/20 hover:text-ivory"
+              title="Export"
+            >
+              <Download size={14} />
+            </button>
+            <Link
+              to="/games/new"
+              className="flex items-center gap-1.5 rounded-xl gradient-accent px-4 py-2.5 text-xs font-bold text-white transition-all hover:opacity-90 active:scale-[0.97] glow-accent"
+            >
+              <Plus size={14} strokeWidth={2.5} />
+              New
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="mb-5 flex gap-1 rounded-2xl border border-separator bg-surface-raised/50 p-1">
+      {/* Filter tabs — pill style */}
+      <div className="mb-6 flex gap-2">
         {(['all', 'active', 'completed'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`relative flex-1 rounded-xl py-2 text-xs font-medium capitalize transition-colors ${
+            className={`relative rounded-full px-4 py-2 text-xs font-semibold capitalize transition-all ${
               filter === f
-                ? 'text-ivory'
-                : 'text-text-secondary hover:text-ivory'
+                ? 'text-accent'
+                : 'text-text-muted hover:text-text-secondary'
             }`}
           >
             {filter === f && (
               <motion.div
                 layoutId="game-filter"
-                className="absolute inset-0 rounded-xl card-surface"
+                className="absolute inset-0 rounded-full border border-accent/20 bg-accent/[0.06]"
                 transition={{ type: 'spring', stiffness: 500, damping: 35 }}
               />
             )}
-            <span className="relative">{f}</span>
+            <span className="relative flex items-center gap-1.5">
+              {f}
+              <span className={`text-[10px] ${filter === f ? 'text-accent/60' : 'text-text-muted'}`}>
+                {counts[f]}
+              </span>
+            </span>
           </button>
         ))}
       </div>
@@ -133,7 +148,7 @@ export default function GameList() {
           action={
             <Link
               to="/games/new"
-              className="inline-flex items-center gap-1.5 rounded-xl gradient-accent px-5 py-2.5 text-sm font-semibold text-white"
+              className="inline-flex items-center gap-1.5 rounded-xl gradient-accent px-5 py-2.5 text-sm font-bold text-white"
             >
               <Plus size={16} />
               New Game
@@ -146,9 +161,9 @@ export default function GameList() {
             {filtered.map((game, i) => (
               <motion.div
                 key={game.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
+                transition={{ delay: i * 0.04, ease: [0.23, 1, 0.32, 1] }}
               >
                 <div
                   onClick={() =>
@@ -158,25 +173,27 @@ export default function GameList() {
                         : `/games/${game.id}/review`,
                     )
                   }
-                  className="group cursor-pointer rounded-2xl card-surface p-4 transition-all hover:card-surface-hover"
+                  className="group relative cursor-pointer overflow-hidden rounded-xl card-surface transition-all duration-200 hover:card-surface-hover"
                 >
-                  <div className="flex items-start justify-between">
+                  {/* Status accent bar on left */}
+                  <div
+                    className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl ${
+                      game.status === 'active' ? 'bg-amber' : 'bg-accent'
+                    }`}
+                  />
+                  <div className="flex items-center justify-between py-3.5 pl-5 pr-4">
                     <div className="min-w-0 flex-1">
-                      <div className="mb-1.5 flex items-center gap-2">
+                      <div className="mb-1 flex items-center gap-2">
                         {game.status === 'active' ? (
-                          <div className="flex items-center gap-1.5 rounded-full bg-gold/10 px-2 py-0.5">
-                            <Clock size={11} className="text-gold" />
-                            <span className="text-[10px] font-medium text-gold">
-                              Active
-                            </span>
-                          </div>
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-amber uppercase tracking-wider">
+                            <Clock size={10} />
+                            Live
+                          </span>
                         ) : (
-                          <div className="flex items-center gap-1.5 rounded-full bg-green/10 px-2 py-0.5">
-                            <CheckCircle size={11} className="text-green" />
-                            <span className="text-[10px] font-medium text-green">
-                              Complete
-                            </span>
-                          </div>
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-accent uppercase tracking-wider">
+                            <CheckCircle size={10} />
+                            Done
+                          </span>
                         )}
                         <span className="text-[10px] text-text-muted">
                           {new Date(game.date).toLocaleDateString()}
@@ -197,7 +214,7 @@ export default function GameList() {
                           e.stopPropagation();
                           setDeleteId(game.id);
                         }}
-                        className="rounded-xl p-2 text-text-muted opacity-0 transition-all hover:bg-red/10 hover:text-red group-hover:opacity-100"
+                        className="rounded-lg p-2 text-text-muted opacity-0 transition-all hover:bg-red/8 hover:text-red group-hover:opacity-100"
                       >
                         <Trash2 size={14} />
                       </button>

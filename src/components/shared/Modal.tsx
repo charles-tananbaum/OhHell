@@ -29,7 +29,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-md sm:items-center"
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/80 backdrop-blur-xl sm:items-center"
           onClick={onClose}
         >
           <motion.div
@@ -37,19 +37,19 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            initial={{ opacity: 0, y: 60, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.95 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            exit={{ opacity: 0, y: 60, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 380 }}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.key === 'Escape' && onClose()}
-            className="w-full max-w-md rounded-t-3xl border border-separator-strong bg-surface-raised p-6 sm:rounded-3xl"
+            className="w-full max-w-md rounded-t-2xl border border-separator-strong bg-surface-raised p-6 shadow-2xl sm:rounded-2xl"
           >
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="font-display text-xl font-semibold text-ivory">{title}</h2>
+              <h2 className="font-display text-xl text-ivory">{title}</h2>
               <button
                 onClick={onClose}
-                className="rounded-full p-1.5 text-text-secondary transition-colors hover:bg-separator hover:text-ivory"
+                className="rounded-lg p-2 text-text-secondary transition-all hover:bg-separator hover:text-ivory"
               >
                 <X size={18} />
               </button>

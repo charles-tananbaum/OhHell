@@ -1,14 +1,14 @@
 import { memo } from 'react';
 
 const PALETTES: [string, string][] = [
-  ['#2d7a4f', '#1a5c38'],
-  ['#7a5c2d', '#5c4520'],
-  ['#4a6b3e', '#354d2d'],
-  ['#6b4a3e', '#4d352d'],
-  ['#3e5a6b', '#2d424d'],
-  ['#6b3e5a', '#4d2d42'],
-  ['#5a6b3e', '#424d2d'],
-  ['#3e6b5a', '#2d4d42'],
+  ['#00d4aa', '#00a88a'],
+  ['#6366f1', '#4f46e5'],
+  ['#0ea5e9', '#0284c7'],
+  ['#f43f5e', '#e11d48'],
+  ['#8b5cf6', '#7c3aed'],
+  ['#f0a030', '#d48a20'],
+  ['#f97316', '#ea580c'],
+  ['#ec4899', '#db2777'],
 ];
 
 function hashName(name: string): number {
@@ -44,10 +44,10 @@ export default memo(function Avatar({ name, size = 'md', className = '' }: Avata
 
   return (
     <div
-      className={`${sizes[size]} flex shrink-0 items-center justify-center rounded-full font-display font-semibold tracking-wide text-ivory/90 ${className}`}
+      className={`${sizes[size]} flex shrink-0 items-center justify-center rounded-full font-bold tracking-wide text-white/95 ${className}`}
       style={{
         background: `linear-gradient(145deg, ${c1}, ${c2})`,
-        boxShadow: `0 2px 8px ${c1}33`,
+        boxShadow: `0 2px 10px ${c1}25, inset 0 1px 0 rgba(255,255,255,0.15)`,
       }}
     >
       {getInitials(name)}

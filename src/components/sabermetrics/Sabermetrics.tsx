@@ -125,7 +125,7 @@ export default function Sabermetrics() {
   if (players.length === 0) {
     return (
       <div>
-        <h1 className="mb-6 font-display text-3xl font-bold tracking-tight text-ivory">Sabermetrics</h1>
+        <h1 className="mb-8 font-display text-4xl tracking-tight text-ivory">Stats</h1>
         <EmptyState
           icon={BarChart3}
           title="No player data"
@@ -137,22 +137,22 @@ export default function Sabermetrics() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Sabermetrics</h1>
+      <div className="mb-6 flex items-start justify-between">
+        <h1 className="font-display text-4xl tracking-tight text-ivory">Stats</h1>
         {userRole === 'admin' && (
           <button
             onClick={recalculateAllElo}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-accent/25 px-3 py-2 text-xs font-semibold text-accent-light transition-all hover:bg-accent/10"
+            className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 px-3 py-1.5 text-xs font-bold text-accent transition-all hover:bg-accent/8"
           >
-            <RefreshCw size={14} />
-            Recalculate ELO
+            <RefreshCw size={12} />
+            Recalc ELO
           </button>
         )}
       </div>
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-x-auto rounded-2xl card-surface"
+        className="overflow-x-auto rounded-xl card-surface"
       >
         <table className="w-full min-w-[600px] text-sm">
           <thead>
@@ -163,18 +163,18 @@ export default function Sabermetrics() {
                   title={col.title}
                   onClick={() => handleSort(col.key)}
                   className={clsx(
-                    'cursor-pointer select-none whitespace-nowrap px-3 py-3.5 text-left font-medium text-text-secondary transition-colors hover:text-ivory',
+                    'cursor-pointer select-none whitespace-nowrap px-3 py-3.5 text-left text-xs font-bold transition-colors hover:text-ivory',
                     col.key !== 'name' && 'text-right',
-                    sortKey === col.key && 'text-accent-light',
+                    sortKey === col.key ? 'text-accent' : 'text-text-secondary',
                   )}
                 >
                   <span className="inline-flex items-center gap-1">
                     {col.label}
                     {sortKey === col.key &&
                       (sortDir === 'asc' ? (
-                        <ChevronUp size={14} />
+                        <ChevronUp size={12} />
                       ) : (
-                        <ChevronDown size={14} />
+                        <ChevronDown size={12} />
                       ))}
                   </span>
                 </th>
@@ -188,7 +188,7 @@ export default function Sabermetrics() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.03 }}
-                className="border-b border-separator last:border-0 transition-colors hover:bg-separator/30"
+                className="border-b border-separator last:border-0 transition-colors hover:bg-separator/20"
               >
                 {columns.map((col) => (
                   <td
@@ -196,6 +196,7 @@ export default function Sabermetrics() {
                     className={clsx(
                       'whitespace-nowrap px-3 py-3',
                       col.key === 'name' ? 'font-semibold text-ivory' : 'text-right text-text-secondary',
+                      col.key === 'elo' && 'text-accent font-bold',
                     )}
                   >
                     {formatValue(player, col.key)}

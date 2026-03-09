@@ -6,7 +6,6 @@ import { getPlacementsFromScores } from '../../lib/stats';
 import Avatar from '../shared/Avatar';
 
 const PODIUM_COLORS = ['text-gold', 'text-silver', 'text-bronze'];
-const PODIUM_BG = ['bg-gold/10', 'bg-silver/10', 'bg-bronze/10'];
 
 export default function GameComplete() {
   const { id } = useParams<{ id: string }>();
@@ -32,60 +31,43 @@ export default function GameComplete() {
       <div className="mb-6 flex items-center gap-3">
         <button
           onClick={() => navigate('/')}
-          className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
+          className="rounded-lg border border-separator p-2 text-text-secondary transition-all hover:border-accent/20 hover:text-ivory"
         >
           <ArrowLeft size={18} />
         </button>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">Game Complete</h1>
+        <h1 className="font-display text-3xl tracking-tight text-ivory">Game Complete</h1>
       </div>
 
-      {/* Podium */}
-      <div className="mb-8 flex items-end justify-center gap-4 pt-6">
-        {ranked.slice(0, 3).map((id, i) => {
-          const player = players.find((p) => p.id === id);
-          const score = game.finalScores![id];
-          return (
-            <motion.div
-              key={id}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.15, type: 'spring' }}
-              className="flex flex-col items-center"
-            >
-              <div className="relative mb-3">
-                {i === 0 && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.4, type: 'spring' }}
-                    className="absolute -top-3 left-1/2 -translate-x-1/2"
-                  >
-                    <Trophy size={20} className="text-gold" />
-                  </motion.div>
-                )}
-                <div
-                  className={`flex items-center justify-center rounded-2xl ${PODIUM_BG[i]} ${
-                    i === 0 ? 'h-16 w-16 ring-2 ring-gold/25' : 'h-14 w-14'
-                  }`}
-                >
-                  <Avatar name={player?.name ?? '?'} size={i === 0 ? 'xl' : 'lg'} />
-                </div>
-              </div>
-              <span className={`text-sm font-bold ${PODIUM_COLORS[i]}`}>
-                {player?.name}
-              </span>
-              <span className="text-xs text-text-secondary">{score} pts</span>
-            </motion.div>
-          );
-        })}
-      </div>
+      {/* Winner spotlight */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2, type: 'spring' }}
+        className="mb-8 rounded-2xl border border-gold/15 bg-gold/[0.04] p-8 text-center"
+      >
+        <motion.div
+          initial={{ scale: 0, rotate: -30 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
+          className="mx-auto mb-4"
+        >
+          <Trophy size={40} className="mx-auto text-gold drop-shadow-lg" />
+        </motion.div>
+        <Avatar name={players.find((p) => p.id === ranked[0])?.name ?? '?'} size="xl" className="mx-auto mb-3 ring-2 ring-gold/25" />
+        <p className="font-display text-2xl text-gold">
+          {players.find((p) => p.id === ranked[0])?.name}
+        </p>
+        <p className="mt-1 text-sm text-text-secondary">
+          {game.finalScores[ranked[0]]} points
+        </p>
+      </motion.div>
 
       {/* Full standings */}
-      <div className="rounded-2xl card-surface p-4">
-        <h3 className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.15em] text-text-secondary">
-          Standings & ELO Changes
-        </h3>
-        <div className="space-y-2">
+      <div className="rounded-xl card-surface overflow-hidden">
+        <div className="border-b border-separator px-5 py-3">
+          <span className="stat-label">Final Standings</span>
+        </div>
+        <div className="p-4 space-y-2">
           {ranked.map((id, i) => {
             const player = players.find((p) => p.id === id);
             const score = game.finalScores![id];
@@ -93,18 +75,18 @@ export default function GameComplete() {
             return (
               <motion.div
                 key={id}
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="flex items-center justify-between rounded-xl bg-separator/50 px-3 py-3"
+                transition={{ delay: i * 0.06 }}
+                className="flex items-center justify-between rounded-lg bg-surface/60 px-4 py-3"
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                   <span
-                    className={`text-xs font-bold ${
+                    className={`font-display text-2xl ${
                       i < 3 ? PODIUM_COLORS[i] : 'text-text-muted'
                     }`}
                   >
-                    #{placements[id]}
+                    {placements[id]}
                   </span>
                   <Avatar name={player?.name ?? '?'} size="sm" />
                   <span className="text-sm font-medium text-ivory">{player?.name}</span>
@@ -112,12 +94,12 @@ export default function GameComplete() {
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-bold text-ivory">{score}</span>
                   <span
-                    className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    className={`flex items-center gap-0.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
                       eloChange > 0
-                        ? 'bg-green/10 text-green'
+                        ? 'bg-green/8 text-green'
                         : eloChange < 0
-                          ? 'bg-red/10 text-red'
-                          : 'bg-separator text-text-secondary'
+                          ? 'bg-red/8 text-red'
+                          : 'bg-surface text-text-secondary'
                     }`}
                   >
                     {eloChange > 0 ? (
@@ -135,16 +117,16 @@ export default function GameComplete() {
         </div>
       </div>
 
-      <div className="mt-5 flex gap-3">
+      <div className="mt-6 flex gap-3">
         <Link
           to="/"
-          className="flex flex-1 items-center justify-center rounded-2xl border border-separator py-3.5 text-sm font-medium text-ivory transition-all hover:bg-separator"
+          className="flex flex-1 items-center justify-center rounded-xl border border-separator py-3 text-sm font-medium text-ivory transition-all hover:bg-separator"
         >
           Home
         </Link>
         <Link
           to={`/games/${game.id}/review`}
-          className="flex flex-1 items-center justify-center rounded-2xl gradient-accent py-3.5 text-sm font-semibold text-white transition-all hover:opacity-90"
+          className="flex flex-1 items-center justify-center rounded-xl gradient-accent py-3 text-sm font-bold text-white transition-all hover:opacity-90"
         >
           View Details
         </Link>

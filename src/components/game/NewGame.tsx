@@ -60,9 +60,11 @@ export default function NewGame() {
 
   const roundCount = generateRoundSequence(maxCards).length;
   const stepIndex = ['select', 'order', 'settings'].indexOf(step);
+  const stepLabels = ['Select Players', 'Seat Order', 'Settings'];
 
   return (
     <div>
+      {/* Header with back + step indicator */}
       <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => {
@@ -70,31 +72,36 @@ export default function NewGame() {
             else if (step === 'order') setStep('select');
             else setStep('order');
           }}
-          className="rounded-xl border border-separator p-2.5 text-text-secondary transition-all hover:border-separator-strong hover:text-ivory"
+          className="rounded-lg border border-separator p-2 text-text-secondary transition-all hover:border-accent/20 hover:text-ivory"
         >
           <ChevronLeft size={18} />
         </button>
-        <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-ivory">New Game</h1>
-          <p className="text-xs text-text-secondary">
-            Step {stepIndex + 1} of 3
-          </p>
+        <div className="flex-1">
+          <h1 className="font-display text-3xl tracking-tight text-ivory">New Game</h1>
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="mb-6 flex gap-1.5">
-        {(['select', 'order', 'settings'] as const).map((s, i) => (
-          <div
-            key={s}
-            className="h-1 flex-1 overflow-hidden rounded-full bg-separator"
-          >
-            <motion.div
-              className="h-full rounded-full gradient-accent"
-              initial={{ width: 0 }}
-              animate={{ width: stepIndex >= i ? '100%' : '0%' }}
-              transition={{ duration: 0.3 }}
-            />
+      {/* Step progress — dots + label */}
+      <div className="mb-7 flex items-center gap-3">
+        {stepLabels.map((label, i) => (
+          <div key={label} className="flex items-center gap-2">
+            <div
+              className={clsx(
+                'flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-all',
+                stepIndex > i && 'gradient-accent text-white',
+                stepIndex === i && 'border-2 border-accent text-accent',
+                stepIndex < i && 'border border-separator text-text-muted',
+              )}
+            >
+              {stepIndex > i ? <Check size={12} /> : i + 1}
+            </div>
+            <span className={clsx(
+              'text-xs font-medium transition-colors',
+              stepIndex === i ? 'text-ivory' : 'text-text-muted',
+            )}>
+              {label}
+            </span>
+            {i < 2 && <div className="h-px w-4 bg-separator" />}
           </div>
         ))}
       </div>
@@ -103,31 +110,29 @@ export default function NewGame() {
         {step === 'select' && (
           <motion.div
             key="select"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
+            exit={{ opacity: 0, x: 24 }}
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-text-secondary">
-                Select players ({selectedIds.length} selected)
+                Choose players <span className="text-text-muted">({selectedIds.length} selected)</span>
               </p>
               <button
                 onClick={() => setShowAddPlayer(true)}
-                className="flex items-center gap-1.5 rounded-xl border border-accent/30 px-3 py-1.5 text-xs font-medium text-accent-light transition-colors hover:bg-accent/10"
+                className="flex items-center gap-1.5 rounded-full border border-accent/25 px-3 py-1.5 text-xs font-bold text-accent transition-all hover:bg-accent/8"
               >
-                <UserPlus size={14} />
-                Add New
+                <UserPlus size={12} />
+                Add
               </button>
             </div>
 
             {players.length === 0 ? (
-              <div className="rounded-2xl card-surface p-10 text-center">
-                <p className="text-sm text-text-secondary">
-                  No players yet. Add some to get started.
-                </p>
+              <div className="rounded-xl border border-dashed border-separator-strong p-10 text-center">
+                <p className="text-sm text-text-secondary">No players yet.</p>
                 <button
                   onClick={() => setShowAddPlayer(true)}
-                  className="mt-4 rounded-xl gradient-accent px-5 py-2.5 text-sm font-semibold text-white"
+                  className="mt-4 rounded-xl gradient-accent px-5 py-2.5 text-sm font-bold text-white"
                 >
                   Add Player
                 </button>
@@ -142,27 +147,28 @@ export default function NewGame() {
                       onClick={() => togglePlayer(player.id)}
                       whileTap={{ scale: 0.97 }}
                       className={clsx(
-                        'flex items-center gap-2.5 rounded-2xl p-3 text-left transition-all',
+                        'relative flex items-center gap-2.5 rounded-xl p-3 text-left transition-all duration-200',
                         selected
-                          ? 'bg-accent/10 ring-1 ring-accent/30 glow-accent'
+                          ? 'border border-accent/25 bg-accent/[0.06]'
                           : 'card-surface hover:card-surface-hover',
                       )}
                     >
                       <Avatar name={player.name} size="md" />
                       <div className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium text-ivory">
+                        <span className="block truncate text-sm font-semibold text-ivory">
                           {player.name}
                         </span>
-                        <span className="text-[10px] text-text-secondary">
-                          ELO {player.elo}
+                        <span className="text-[10px] text-text-muted">
+                          {player.elo} ELO
                         </span>
                       </div>
                       {selected && (
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
+                          className="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full gradient-accent"
                         >
-                          <Check size={16} className="text-accent-light" />
+                          <Check size={10} className="text-white" />
                         </motion.div>
                       )}
                     </motion.button>
@@ -174,10 +180,10 @@ export default function NewGame() {
             <button
               onClick={goToOrder}
               disabled={selectedIds.length < 2}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl gradient-accent py-3.5 font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-30"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl gradient-accent py-3.5 font-bold text-white transition-all active:scale-[0.98] disabled:opacity-25"
             >
-              Next
-              <ChevronRight size={18} />
+              Continue
+              <ChevronRight size={16} />
             </button>
 
             {showAddPlayer && (
@@ -189,12 +195,12 @@ export default function NewGame() {
         {step === 'order' && (
           <motion.div
             key="order"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
+            exit={{ opacity: 0, x: 24 }}
           >
-            <p className="mb-3 text-sm text-text-secondary">
-              Arrange seat order
+            <p className="mb-4 text-sm text-text-secondary">
+              Drag to arrange seating
             </p>
             <div className="space-y-2">
               {orderedIds.map((id, i) => {
@@ -203,29 +209,31 @@ export default function NewGame() {
                   <motion.div
                     key={id}
                     layout
-                    className="flex items-center gap-3 rounded-2xl card-surface p-3"
+                    className="flex items-center gap-3 rounded-xl card-surface px-4 py-3"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-separator text-xs font-bold text-text-secondary">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/10 text-[10px] font-bold text-accent">
                       {i + 1}
                     </span>
                     <Avatar name={player?.name ?? ''} size="sm" />
-                    <span className="flex-1 text-sm font-medium text-ivory">
+                    <span className="flex-1 text-sm font-semibold text-ivory">
                       {player?.name}
                     </span>
-                    <button
-                      onClick={() => movePlayer(i, -1)}
-                      disabled={i === 0}
-                      className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-separator disabled:opacity-20"
-                    >
-                      <ArrowUp size={16} />
-                    </button>
-                    <button
-                      onClick={() => movePlayer(i, 1)}
-                      disabled={i === orderedIds.length - 1}
-                      className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-separator disabled:opacity-20"
-                    >
-                      <ArrowDown size={16} />
-                    </button>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => movePlayer(i, -1)}
+                        disabled={i === 0}
+                        className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-separator disabled:opacity-20"
+                      >
+                        <ArrowUp size={14} />
+                      </button>
+                      <button
+                        onClick={() => movePlayer(i, 1)}
+                        disabled={i === orderedIds.length - 1}
+                        className="rounded-lg p-1.5 text-text-secondary transition-all hover:bg-separator disabled:opacity-20"
+                      >
+                        <ArrowDown size={14} />
+                      </button>
+                    </div>
                   </motion.div>
                 );
               })}
@@ -233,10 +241,10 @@ export default function NewGame() {
 
             <button
               onClick={goToSettings}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl gradient-accent py-3.5 font-semibold text-white transition-all active:scale-[0.98]"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl gradient-accent py-3.5 font-bold text-white transition-all active:scale-[0.98]"
             >
-              Next
-              <ChevronRight size={18} />
+              Continue
+              <ChevronRight size={16} />
             </button>
           </motion.div>
         )}
@@ -244,15 +252,14 @@ export default function NewGame() {
         {step === 'settings' && (
           <motion.div
             key="settings"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
+            exit={{ opacity: 0, x: 24 }}
           >
             <div className="space-y-4">
-              <div className="rounded-2xl card-surface p-5">
-                <label className="mb-3 block text-sm font-medium text-text-secondary">
-                  Max cards per round
-                </label>
+              {/* Max cards */}
+              <div className="rounded-xl card-surface p-5">
+                <label className="stat-label mb-3 block">Max cards per round</label>
                 <div className="flex items-center gap-4">
                   <input
                     type="range"
@@ -262,19 +269,18 @@ export default function NewGame() {
                     onChange={(e) => setMaxCards(Number(e.target.value))}
                     className="flex-1"
                   />
-                  <span className="flex h-10 w-12 items-center justify-center rounded-xl bg-accent/10 text-lg font-bold text-accent-light">
+                  <span className="flex h-10 w-12 items-center justify-center rounded-lg bg-accent/10 font-display text-xl text-accent">
                     {maxCards}
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-text-muted">
-                  {roundCount} total rounds (1 → {maxCards} → 1)
+                  {roundCount} rounds (1 → {maxCards} → 1)
                 </p>
               </div>
 
-              <div className="rounded-2xl card-surface p-5">
-                <label className="mb-3 block text-sm font-medium text-text-secondary">
-                  First dealer
-                </label>
+              {/* First dealer */}
+              <div className="rounded-xl card-surface p-5">
+                <label className="stat-label mb-3 block">First dealer</label>
                 <div className="space-y-1.5">
                   {orderedIds.map((id, i) => {
                     const player = players.find((p) => p.id === id);
@@ -283,34 +289,35 @@ export default function NewGame() {
                         key={id}
                         onClick={() => setDealerIndex(i)}
                         className={clsx(
-                          'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all',
+                          'flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-all duration-200',
                           dealerIndex === i
-                            ? 'bg-accent/10 font-semibold text-accent-light ring-1 ring-accent/25'
+                            ? 'bg-accent/8 text-accent ring-1 ring-accent/20'
                             : 'text-text-secondary hover:bg-separator hover:text-ivory',
                         )}
                       >
                         <Avatar name={player?.name ?? ''} size="sm" />
-                        {dealerIndex === i && <Check size={14} />}
-                        <span>{player?.name}</span>
+                        <span className="font-medium">{player?.name}</span>
+                        {dealerIndex === i && <Check size={14} className="ml-auto text-accent" />}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="rounded-2xl card-surface p-4">
-                <p className="text-xs text-text-muted">Scoring</p>
-                <p className="mt-0.5 text-sm font-medium text-ivory">
-                  Exact bid = 10 + tricks · Miss = tricks taken
+              {/* Scoring rule */}
+              <div className="rounded-xl border border-separator px-4 py-3">
+                <p className="stat-label mb-0.5">Scoring</p>
+                <p className="text-sm font-medium text-ivory">
+                  Hit = 10 + tricks · Miss = tricks taken
                 </p>
               </div>
             </div>
 
             <button
               onClick={handleStart}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl gradient-green py-3.5 font-semibold text-white transition-all active:scale-[0.98] glow-accent"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl gradient-green py-3.5 font-bold text-white transition-all active:scale-[0.98]"
             >
-              <Sparkles size={18} />
+              <Sparkles size={16} />
               Start Game
             </button>
           </motion.div>

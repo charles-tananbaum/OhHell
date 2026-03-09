@@ -23,21 +23,21 @@ export default function NumberStepper({
       {label && (
         <span className="text-sm text-text-secondary">{label}</span>
       )}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1">
         <button
           type="button"
           onClick={() => onChange(Math.max(min, value - 1))}
           disabled={value <= min}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-30"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-separator text-ivory transition-all hover:bg-separator hover:border-separator-strong active:scale-95 disabled:opacity-20"
         >
           <Minus size={16} />
         </button>
         <span
           className={clsx(
-            'flex h-9 w-11 items-center justify-center rounded-xl text-sm font-bold',
+            'flex h-10 w-12 items-center justify-center rounded-xl text-sm font-bold',
             disabled !== undefined && value === disabled
-              ? 'bg-red/15 text-red ring-1 ring-red/20'
-              : 'card-surface text-ivory',
+              ? 'bg-red/12 text-red ring-1 ring-red/20'
+              : 'bg-surface-raised text-ivory',
           )}
         >
           {value}
@@ -46,7 +46,7 @@ export default function NumberStepper({
           type="button"
           onClick={() => onChange(Math.min(max, value + 1))}
           disabled={value >= max}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-separator text-ivory transition-all hover:bg-separator active:scale-95 disabled:opacity-30"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-separator text-ivory transition-all hover:bg-separator hover:border-separator-strong active:scale-95 disabled:opacity-20"
         >
           <Plus size={16} />
         </button>

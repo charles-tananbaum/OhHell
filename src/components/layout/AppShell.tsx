@@ -4,7 +4,7 @@ import Toast from '../shared/Toast';
 
 export default function AppShell() {
   return (
-    <div className="felt-bg relative min-h-dvh pb-20">
+    <div className="felt-bg relative min-h-dvh pb-24">
       <div className="page-bg min-h-dvh">
         <main className="mx-auto max-w-lg px-4 pt-6 pb-4">
           <Outlet />

@@ -9,90 +9,64 @@ interface PlayerAnalysisProps {
 const columns = [
   {
     key: 'pros' as const,
-    label: 'Pros',
+    label: 'Strengths',
     icon: Zap,
-    colors: { header: 'text-green', bg: 'bg-green/8', border: 'border-green/15' },
+    color: 'text-green',
+    accent: 'border-green/15',
   },
   {
     key: 'cons' as const,
-    label: 'Cons',
+    label: 'Weaknesses',
     icon: AlertTriangle,
-    colors: { header: 'text-red', bg: 'bg-red/8', border: 'border-red/15' },
+    color: 'text-red',
+    accent: 'border-red/15',
   },
   {
     key: 'advice' as const,
     label: 'Advice',
     icon: Lightbulb,
-    colors: { header: 'text-gold', bg: 'bg-gold/8', border: 'border-gold/15' },
+    color: 'text-amber',
+    accent: 'border-amber/15',
   },
 ] as const;
 
 export default function PlayerAnalysis({ analysis }: PlayerAnalysisProps) {
   if (!analysis) {
     return (
-      <div className="rounded-2xl card-surface p-6 text-center text-sm text-text-secondary">
+      <div className="rounded-xl border border-dashed border-separator-strong py-8 text-center text-sm text-text-secondary">
         Not enough data yet — play some games first!
       </div>
     );
   }
 
-  const maxRows = Math.max(
-    analysis.pros.length,
-    analysis.cons.length,
-    analysis.advice.length,
-  );
-
   return (
-    <div className="overflow-x-auto rounded-2xl card-surface">
-      <table className="w-full">
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th
-                key={col.key}
-                className="w-1/3 border-b border-separator-strong px-3 py-3 text-left"
+    <div className="space-y-3">
+      {columns.map((col) => (
+        <div key={col.key} className="rounded-xl card-surface overflow-hidden">
+          <div className={`flex items-center gap-1.5 border-b ${col.accent} px-4 py-2.5`}>
+            <col.icon size={13} className={col.color} />
+            <span className={`text-xs font-bold uppercase tracking-wider ${col.color}`}>
+              {col.label}
+            </span>
+          </div>
+          <div className="divide-y divide-separator">
+            {analysis[col.key].map((item: PlayerAnalysisItem, idx: number) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                className="px-4 py-3"
               >
-                <div className="flex items-center gap-1.5">
-                  <col.icon size={14} className={col.colors.header} />
-                  <span className={`font-display text-xs font-semibold uppercase tracking-wider ${col.colors.header}`}>
-                    {col.label}
-                  </span>
-                </div>
-              </th>
+                <p className="text-xs font-bold text-ivory">{item.title}</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-text-secondary">
+                  {item.detail}
+                </p>
+              </motion.div>
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {Array.from({ length: maxRows }).map((_, rowIdx) => (
-            <motion.tr
-              key={rowIdx}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: rowIdx * 0.05 }}
-              className="border-b border-separator last:border-b-0"
-            >
-              {columns.map((col) => {
-                const item: PlayerAnalysisItem | undefined = analysis[col.key][rowIdx];
-                return (
-                  <td
-                    key={col.key}
-                    className="w-1/3 px-3 py-3 align-top"
-                  >
-                    {item ? (
-                      <div>
-                        <p className="text-xs font-semibold text-ivory">{item.title}</p>
-                        <p className="mt-0.5 text-[11px] leading-relaxed text-text-secondary">
-                          {item.detail}
-                        </p>
-                      </div>
-                    ) : null}
-                  </td>
-                );
-              })}
-            </motion.tr>
-          ))}
-        </tbody>
-      </table>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

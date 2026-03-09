@@ -18,12 +18,14 @@ export default function RoundSummary({
   const players = useStore((s) => s.players);
 
   return (
-    <div className="rounded-2xl card-surface p-4">
-      <h3 className="mb-3 font-display text-base font-semibold text-ivory">
-        Round {round.roundNumber} Summary
-      </h3>
+    <div className="rounded-xl card-surface overflow-hidden">
+      <div className="border-b border-separator px-5 py-3">
+        <h3 className="text-sm font-bold text-ivory">
+          Round {round.roundNumber} Results
+        </h3>
+      </div>
 
-      <div className="space-y-2">
+      <div className="p-5 space-y-2">
         {playerIds.map((id, i) => {
           const player = players.find((p) => p.id === id);
           const bid = round.bids[id];
@@ -34,43 +36,43 @@ export default function RoundSummary({
           return (
             <motion.div
               key={id}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="flex items-center justify-between rounded-xl bg-separator/50 px-3 py-2.5"
+              transition={{ delay: i * 0.08 }}
+              className="flex items-center justify-between rounded-lg bg-surface/60 px-3.5 py-2.5"
             >
               <div className="flex items-center gap-2.5">
                 <div
-                  className={`flex h-7 w-7 items-center justify-center rounded-full ${
-                    hit ? 'bg-green/15' : 'bg-red/15'
+                  className={`flex h-6 w-6 items-center justify-center rounded-full ${
+                    hit ? 'bg-green/12' : 'bg-red/12'
                   }`}
                 >
                   {hit ? (
-                    <Check size={14} className="text-green" />
+                    <Check size={12} className="text-green" />
                   ) : (
-                    <X size={14} className="text-red" />
+                    <X size={12} className="text-red" />
                   )}
                 </div>
                 <Avatar name={player?.name ?? '?'} size="sm" />
                 <span className="text-sm font-medium text-ivory">{player?.name}</span>
                 {id === round.dealerPlayerId && (
-                  <span className="inline-flex h-4 items-center rounded-full bg-gold/15 px-1.5 text-[9px] font-bold text-gold">
+                  <span className="inline-flex h-4 items-center rounded bg-amber/10 px-1.5 text-[9px] font-bold text-amber">
                     D
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-text-muted">
+              <div className="flex items-center gap-2.5">
+                <span className="text-[10px] text-text-muted">
                   bid {bid} · took {tricks}
                 </span>
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: i * 0.1 + 0.2, type: 'spring' }}
-                  className={`flex h-7 min-w-[2rem] items-center justify-center rounded-lg text-sm font-bold ${
+                  transition={{ delay: i * 0.08 + 0.15, type: 'spring' }}
+                  className={`flex h-7 min-w-[2rem] items-center justify-center rounded-full text-xs font-bold ${
                     hit
                       ? 'bg-green/10 text-green'
-                      : 'bg-separator text-text-secondary'
+                      : 'bg-surface text-text-muted'
                   }`}
                 >
                   +{score}
@@ -81,12 +83,14 @@ export default function RoundSummary({
         })}
       </div>
 
-      <button
-        onClick={onNext}
-        className="mt-4 w-full rounded-2xl gradient-accent py-3 text-sm font-semibold text-white transition-all active:scale-[0.98]"
-      >
-        Next Round
-      </button>
+      <div className="border-t border-separator px-5 py-4">
+        <button
+          onClick={onNext}
+          className="w-full rounded-xl gradient-accent py-3 text-sm font-bold text-white transition-all active:scale-[0.98]"
+        >
+          Next Round
+        </button>
+      </div>
     </div>
   );
 }

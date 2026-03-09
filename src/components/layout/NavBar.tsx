@@ -18,46 +18,44 @@ export default function NavBar() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]">
-      <div className="glass-strong border-t border-separator-strong">
-        <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">
-          {tabs.map(({ to, icon: Icon, label }) => {
-            const active = isActive(to);
-            return (
-              <NavLink
-                key={to}
-                to={to}
-                className="relative flex flex-col items-center gap-0.5 px-5 py-2"
-              >
-                {active && (
-                  <motion.div
-                    layoutId="nav-pill"
-                    className="absolute inset-0 rounded-xl"
-                    style={{
-                      background: 'linear-gradient(145deg, rgba(45, 122, 79, 0.12), rgba(45, 122, 79, 0.04))',
-                      border: '1px solid rgba(45, 122, 79, 0.18)',
-                    }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <Icon
-                  size={19}
-                  strokeWidth={active ? 2.2 : 1.5}
-                  className={`relative z-10 transition-colors duration-200 ${
-                    active ? 'text-accent-light' : 'text-text-muted'
-                  }`}
+    <nav className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]">
+      <div className="flex items-center gap-1 rounded-full glass-strong px-2 py-1.5 shadow-2xl shadow-black/40">
+        {tabs.map(({ to, icon: Icon, label }) => {
+          const active = isActive(to);
+          return (
+            <NavLink
+              key={to}
+              to={to}
+              className="relative flex items-center gap-1.5 px-4 py-2"
+            >
+              {active && (
+                <motion.div
+                  layoutId="nav-pill"
+                  className="absolute inset-0 rounded-full gradient-accent"
+                  style={{ opacity: 0.15 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 32 }}
                 />
-                <span
-                  className={`relative z-10 text-[10px] font-medium tracking-wide transition-colors duration-200 ${
-                    active ? 'text-accent-light' : 'text-text-muted'
-                  }`}
+              )}
+              <Icon
+                size={16}
+                strokeWidth={active ? 2.4 : 1.6}
+                className={`relative z-10 transition-colors duration-200 ${
+                  active ? 'text-accent' : 'text-text-muted'
+                }`}
+              />
+              {active && (
+                <motion.span
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 'auto', opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  className="relative z-10 overflow-hidden whitespace-nowrap text-xs font-bold text-accent"
                 >
                   {label}
-                </span>
-              </NavLink>
-            );
-          })}
-        </div>
+                </motion.span>
+              )}
+            </NavLink>
+          );
+        })}
       </div>
     </nav>
   );
