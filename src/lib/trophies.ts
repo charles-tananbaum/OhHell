@@ -28,7 +28,7 @@ function formatDate(iso: string): string {
   });
 }
 
-function getPlayerName(playerId: string, players: Player[]): string {
+function getPlayerName(playerId: string, players: readonly Player[]): string {
   return players.find((p) => p.id === playerId)?.name ?? 'Unknown';
 }
 
