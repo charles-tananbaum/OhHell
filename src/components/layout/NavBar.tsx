@@ -1,12 +1,13 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Spade, Users, Trophy, BarChart3 } from 'lucide-react';
+import { Spade, Users, Trophy, BarChart3, Medal } from 'lucide-react';
 
 const tabs = [
   { to: '/', icon: Spade, label: 'Games' },
   { to: '/players', icon: Users, label: 'Players' },
   { to: '/leaderboard', icon: Trophy, label: 'Rankings' },
   { to: '/sabermetrics', icon: BarChart3, label: 'Stats' },
+  { to: '/trophies', icon: Medal, label: 'Trophies' },
 ];
 
 export default function NavBar() {
@@ -26,7 +27,7 @@ export default function NavBar() {
             <NavLink
               key={to}
               to={to}
-              className="relative flex items-center gap-1.5 px-4 py-2"
+              className="relative flex items-center gap-1.5 px-3 py-2"
             >
               {active && (
                 <motion.div

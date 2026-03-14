@@ -13,6 +13,7 @@ const PlayerList = lazy(() => import('./components/players/PlayerList'));
 const PlayerDetail = lazy(() => import('./components/players/PlayerDetail'));
 const Leaderboard = lazy(() => import('./components/leaderboard/Leaderboard'));
 const Sabermetrics = lazy(() => import('./components/sabermetrics/Sabermetrics'));
+const TrophyRoom = lazy(() => import('./components/trophies/TrophyRoom'));
 
 function RouteLoader() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/players/:id" element={<Suspense fallback={<RouteLoader />}><PlayerDetail /></Suspense>} />
               <Route path="/leaderboard" element={<Suspense fallback={<RouteLoader />}><Leaderboard /></Suspense>} />
               <Route path="/sabermetrics" element={<Suspense fallback={<RouteLoader />}><Sabermetrics /></Suspense>} />
+              <Route path="/trophies" element={<Suspense fallback={<RouteLoader />}><TrophyRoom /></Suspense>} />
             </Route>
           </Routes>
         </AnimatePresence>
