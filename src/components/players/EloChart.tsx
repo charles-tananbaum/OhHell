@@ -18,7 +18,6 @@ interface ChartPoint {
 
 export default function EloChart({ history }: EloChartProps) {
   const games = useStore((s) => s.games);
-  const players = useStore((s) => s.players);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
