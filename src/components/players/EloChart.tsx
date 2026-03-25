@@ -40,11 +40,6 @@ export default function EloChart({ history }: EloChartProps) {
     },
     ...history.map((h) => {
       const game = games.find((g) => g.id === h.gameId);
-      const opponentNames = game
-        ? game.playerIds
-            .filter((pid) => pid !== history[0]?.gameId) // just get all player names
-            .map((pid) => players.find((p) => p.id === pid)?.name ?? '?')
-        : [];
       const playerCount = game?.playerIds.length ?? 0;
       return {
         elo: h.eloAfter,
