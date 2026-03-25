@@ -3,6 +3,9 @@ export const ELO_K_FACTOR = 32;
 export const ELO_WEIGHT_PLACEMENT = 0.65;
 export const ELO_WEIGHT_BID_ACCURACY = 0.25;
 export const ELO_WEIGHT_AMBITION = 0.10;
+// Reference values for ELO scaling — games close to these values get ~1x multiplier
+export const ELO_REFERENCE_PLAYERS = 4;
+export const ELO_REFERENCE_ROUNDS = 13;
 export const ADMIN_PASSWORD = 'ohhell';
 export const LIMITED_PASSWORD = 'gametime';
 export const STORE_NAME = 'ohhell-store';

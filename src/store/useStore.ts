@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Player, Game, Round } from '../types';
-import { DEFAULT_ELO, ADMIN_PASSWORD, LIMITED_PASSWORD, STORE_NAME } from '../constants';
+import { DEFAULT_ELO, ADMIN_PASSWORD, STORE_NAME } from '../constants';
 import { generatePlayerId, generateGameId } from '../lib/ids';
 import {
   generateRoundSequence,
@@ -70,6 +70,7 @@ interface StoreState {
     tricks: Record<string, number>,
   ) => void;
   advanceRound: (gameId: string) => void;
+  rewindToRound: (gameId: string, roundIndex: number) => void;
   completeGame: (gameId: string) => void;
 
   // ELO recalculation
@@ -130,24 +131,20 @@ async function syncPlayer(player: Player, toast?: (msg: string, type: 'success' 
 export const useStore = create<StoreState>()((set, get) => ({
   players: [],
   games: [],
-  userRole: false,
+  userRole: 'limited' as UserRole,
   toasts: [],
   dbReady: false,
 
-  // Auth — admin gets full access, limited can add but not delete
+  // Auth — admin gets full access, everyone else has limited access by default
   login: (password: string) => {
     if (password === ADMIN_PASSWORD) {
       set({ userRole: 'admin' });
       return true;
     }
-    if (password === LIMITED_PASSWORD) {
-      set({ userRole: 'limited' });
-      return true;
-    }
     return false;
   },
 
-  logout: () => set({ userRole: false }),
+  logout: () => set({ userRole: 'limited' }),
 
   // DB sync — Supabase is source of truth, localStorage is fallback
   loadFromDb: async () => {
@@ -412,6 +409,37 @@ export const useStore = create<StoreState>()((set, get) => ({
     if (game) syncGame(game, get().addToast);
   },
 
+  rewindToRound: (gameId: string, roundIndex: number) => {
+    set((state) => {
+      const games = state.games.map((game) => {
+        if (game.id !== gameId) return game;
+        if (roundIndex < 0 || roundIndex >= game.rounds.length) return game;
+
+        // Keep rounds up to the target, reset the target round to bidding
+        const keptRounds = game.rounds.slice(0, roundIndex);
+        const targetRound = game.rounds[roundIndex];
+        const resetRound: Round = {
+          ...targetRound,
+          bids: {},
+          tricksTaken: {},
+          scores: {},
+          status: 'bidding',
+        };
+
+        return {
+          ...game,
+          currentRoundIndex: roundIndex,
+          rounds: [...keptRounds, resetRound],
+        };
+      });
+      saveToLocal(state.players, games);
+      return { games };
+    });
+    const game = get().games.find((g) => g.id === gameId);
+    if (game) syncGame(game, get().addToast);
+    get().addToast(`Rewound to Round ${roundIndex + 1}`, 'success');
+  },
+
   completeGame: (gameId: string) => {
     const state = get();
     const game = state.games.find((g) => g.id === gameId);
@@ -435,7 +463,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       const p = state.players.find((pl) => pl.id === id)!;
       return { id: p.id, elo: p.elo };
     });
-    const eloChanges = calculateEloChanges(eloPlayers, performanceScores);
+    const eloChanges = calculateEloChanges(eloPlayers, performanceScores, completedRounds.length);
 
     const updatedPlayers = state.players.map((player) => {
       if (!game.playerIds.includes(player.id)) return player;
@@ -525,7 +553,7 @@ export const useStore = create<StoreState>()((set, get) => ({
         id,
         elo: playerMap[id].elo,
       }));
-      const eloChanges = calculateEloChanges(eloPlayers, performanceScores);
+      const eloChanges = calculateEloChanges(eloPlayers, performanceScores, completedRounds.length);
 
       for (const id of gamePlayers) {
         const eloBefore = playerMap[id].elo;

@@ -1,9 +1,13 @@
+import { useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trophy, ArrowLeft, TrendingUp, TrendingDown } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { getPlacementsFromScores } from '../../lib/stats';
+import { calculatePerformanceScores, generateEloExplanations } from '../../lib/elo';
+import type { EloExplanation } from '../../lib/elo';
 import Avatar from '../shared/Avatar';
+import EloBreakdown from './EloBreakdown';
 
 const PODIUM_COLORS = ['text-gold', 'text-silver', 'text-bronze'];
 
@@ -12,6 +16,51 @@ export default function GameComplete() {
   const navigate = useNavigate();
   const game = useStore((s) => s.games.find((g) => g.id === id));
   const players = useStore((s) => s.players);
+
+  const explanations: Record<string, EloExplanation> = useMemo(() => {
+    if (!game || !game.finalScores || !game.eloChanges) return {};
+
+    const placements = getPlacementsFromScores(game.finalScores);
+    const completedRounds = game.rounds.filter((r) => r.status === 'complete');
+
+    // Reconstruct ELO at time of game from eloChanges
+    // Each player's ELO before the game = current ELO - changes applied after this game
+    // But we can also look at eloHistory
+    const eloPlayers = game.playerIds.map((pid) => {
+      const player = players.find((p) => p.id === pid);
+      if (!player) return { id: pid, elo: 1000 };
+
+      // Find the history entry for this game to get eloBefore
+      const histEntry = player.eloHistory.find((h) => h.gameId === game.id);
+      return { id: pid, elo: histEntry?.eloBefore ?? player.elo };
+    });
+
+    const performanceScores = calculatePerformanceScores(
+      game.playerIds,
+      completedRounds,
+      placements,
+    );
+
+    const playerNames: Record<string, string> = {};
+    for (const pid of game.playerIds) {
+      playerNames[pid] = players.find((p) => p.id === pid)?.name ?? '?';
+    }
+
+    const list = generateEloExplanations(
+      eloPlayers,
+      playerNames,
+      performanceScores,
+      placements,
+      completedRounds,
+      game.eloChanges,
+    );
+
+    const map: Record<string, EloExplanation> = {};
+    for (const exp of list) {
+      map[exp.playerId] = exp;
+    }
+    return map;
+  }, [game, players]);
 
   if (!game || !game.finalScores || !game.eloChanges) {
     return (
@@ -62,7 +111,7 @@ export default function GameComplete() {
         </p>
       </motion.div>
 
-      {/* Full standings */}
+      {/* Full standings with ELO breakdown */}
       <div className="rounded-xl card-surface overflow-hidden">
         <div className="border-b border-separator px-5 py-3">
           <span className="stat-label">Final Standings</span>
@@ -72,45 +121,53 @@ export default function GameComplete() {
             const player = players.find((p) => p.id === id);
             const score = game.finalScores![id];
             const eloChange = game.eloChanges![id];
+            const explanation = explanations[id];
             return (
               <motion.div
                 key={id}
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.06 }}
-                className="flex items-center justify-between rounded-lg bg-surface/60 px-4 py-3"
+                className="rounded-lg bg-surface/60 px-4 py-3"
               >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`font-display text-2xl ${
-                      i < 3 ? PODIUM_COLORS[i] : 'text-text-muted'
-                    }`}
-                  >
-                    {placements[id]}
-                  </span>
-                  <Avatar name={player?.name ?? '?'} size="sm" />
-                  <span className="text-sm font-medium text-ivory">{player?.name}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`font-display text-2xl ${
+                        i < 3 ? PODIUM_COLORS[i] : 'text-text-muted'
+                      }`}
+                    >
+                      {placements[id]}
+                    </span>
+                    <Avatar name={player?.name ?? '?'} size="sm" />
+                    <span className="text-sm font-medium text-ivory">{player?.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-bold text-ivory">{score}</span>
+                    <span
+                      className={`flex items-center gap-0.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                        eloChange > 0
+                          ? 'bg-green/8 text-green'
+                          : eloChange < 0
+                            ? 'bg-red/8 text-red'
+                            : 'bg-surface text-text-secondary'
+                      }`}
+                    >
+                      {eloChange > 0 ? (
+                        <TrendingUp size={10} />
+                      ) : eloChange < 0 ? (
+                        <TrendingDown size={10} />
+                      ) : null}
+                      {eloChange > 0 ? '+' : ''}
+                      {eloChange}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-ivory">{score}</span>
-                  <span
-                    className={`flex items-center gap-0.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
-                      eloChange > 0
-                        ? 'bg-green/8 text-green'
-                        : eloChange < 0
-                          ? 'bg-red/8 text-red'
-                          : 'bg-surface text-text-secondary'
-                    }`}
-                  >
-                    {eloChange > 0 ? (
-                      <TrendingUp size={10} />
-                    ) : eloChange < 0 ? (
-                      <TrendingDown size={10} />
-                    ) : null}
-                    {eloChange > 0 ? '+' : ''}
-                    {eloChange}
-                  </span>
-                </div>
+                {explanation && (
+                  <div className="mt-1.5 ml-10">
+                    <EloBreakdown explanation={explanation} />
+                  </div>
+                )}
               </motion.div>
             );
           })}

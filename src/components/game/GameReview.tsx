@@ -1,15 +1,59 @@
+import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Check, X } from 'lucide-react';
+import { ChevronLeft, Check, X, TrendingUp, TrendingDown } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { getPlacementsFromScores } from '../../lib/stats';
+import { calculatePerformanceScores, generateEloExplanations } from '../../lib/elo';
+import type { EloExplanation } from '../../lib/elo';
 import Avatar from '../shared/Avatar';
+import EloBreakdown from './EloBreakdown';
 
 export default function GameReview() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const game = useStore((s) => s.games.find((g) => g.id === id));
   const players = useStore((s) => s.players);
+
+  const explanations: Record<string, EloExplanation> = useMemo(() => {
+    if (!game || !game.finalScores || !game.eloChanges) return {};
+
+    const placements = getPlacementsFromScores(game.finalScores);
+    const completedRounds = game.rounds.filter((r) => r.status === 'complete');
+
+    const eloPlayers = game.playerIds.map((pid) => {
+      const player = players.find((p) => p.id === pid);
+      if (!player) return { id: pid, elo: 1000 };
+      const histEntry = player.eloHistory.find((h) => h.gameId === game.id);
+      return { id: pid, elo: histEntry?.eloBefore ?? player.elo };
+    });
+
+    const performanceScores = calculatePerformanceScores(
+      game.playerIds,
+      completedRounds,
+      placements,
+    );
+
+    const playerNames: Record<string, string> = {};
+    for (const pid of game.playerIds) {
+      playerNames[pid] = players.find((p) => p.id === pid)?.name ?? '?';
+    }
+
+    const list = generateEloExplanations(
+      eloPlayers,
+      playerNames,
+      performanceScores,
+      placements,
+      completedRounds,
+      game.eloChanges,
+    );
+
+    const map: Record<string, EloExplanation> = {};
+    for (const exp of list) {
+      map[exp.playerId] = exp;
+    }
+    return map;
+  }, [game, players]);
 
   if (!game) {
     return (
@@ -41,7 +85,7 @@ export default function GameReview() {
         </div>
       </div>
 
-      {/* Final scores */}
+      {/* Final scores with ELO */}
       {game.finalScores && (
         <div className="mb-5 rounded-xl card-surface overflow-hidden">
           <div className="border-b border-separator px-5 py-3">
@@ -53,23 +97,55 @@ export default function GameReview() {
               const ranked = [...game.playerIds].sort(
                 (a, b) => placements[a] - placements[b],
               );
-              return ranked.map((pid) => (
-                <div
-                  key={pid}
-                  className="flex items-center justify-between rounded-lg bg-surface/60 px-4 py-2.5"
-                >
-                  <span className="flex items-center gap-3 text-sm">
-                    <span className="font-display text-lg text-text-muted">
-                      {placements[pid]}
-                    </span>
-                    <Avatar name={getName(pid)} size="sm" />
-                    <span className="font-medium text-ivory">{getName(pid)}</span>
-                  </span>
-                  <span className="font-display text-lg text-ivory">
-                    {game.finalScores![pid]}
-                  </span>
-                </div>
-              ));
+              return ranked.map((pid) => {
+                const eloChange = game.eloChanges?.[pid];
+                const explanation = explanations[pid];
+                return (
+                  <div
+                    key={pid}
+                    className="rounded-lg bg-surface/60 px-4 py-2.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-3 text-sm">
+                        <span className="font-display text-lg text-text-muted">
+                          {placements[pid]}
+                        </span>
+                        <Avatar name={getName(pid)} size="sm" />
+                        <span className="font-medium text-ivory">{getName(pid)}</span>
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-display text-lg text-ivory">
+                          {game.finalScores![pid]}
+                        </span>
+                        {eloChange != null && (
+                          <span
+                            className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                              eloChange > 0
+                                ? 'bg-green/8 text-green'
+                                : eloChange < 0
+                                  ? 'bg-red/8 text-red'
+                                  : 'bg-surface text-text-secondary'
+                            }`}
+                          >
+                            {eloChange > 0 ? (
+                              <TrendingUp size={9} />
+                            ) : eloChange < 0 ? (
+                              <TrendingDown size={9} />
+                            ) : null}
+                            {eloChange > 0 ? '+' : ''}
+                            {eloChange}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {explanation && (
+                      <div className="mt-1 ml-10">
+                        <EloBreakdown explanation={explanation} />
+                      </div>
+                    )}
+                  </div>
+                );
+              });
             })()}
           </div>
         </div>

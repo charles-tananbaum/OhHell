@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Send, Sparkles } from 'lucide-react';
+import { ChevronLeft, Send, Sparkles, RotateCcw } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import Scoreboard from './Scoreboard';
 import GameNarratives from './GameNarratives';
 import RoundFlow from './RoundFlow';
 import ConfirmDialog from '../shared/ConfirmDialog';
+import RewindModal from './RewindModal';
 
 export default function ActiveGame() {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,7 @@ export default function ActiveGame() {
   const game = useStore((s) => s.games.find((g) => g.id === id));
   const completeGame = useStore((s) => s.completeGame);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showRewind, setShowRewind] = useState(false);
 
   if (!game) {
     return (
@@ -51,11 +53,20 @@ export default function ActiveGame() {
         <div className="flex-1">
           <h1 className="font-display text-3xl tracking-tight text-ivory">Live Game</h1>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-amber/10 px-3 py-1">
-          <div className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse-glow" />
-          <span className="text-[10px] font-bold text-amber uppercase tracking-wider">
-            Round {game.currentRoundIndex + 1}/{game.roundSequence.length}
-          </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowRewind(true)}
+            className="rounded-lg border border-separator p-2 text-text-muted transition-all hover:border-amber/30 hover:text-amber"
+            title="Rewind to a previous round"
+          >
+            <RotateCcw size={14} />
+          </button>
+          <div className="flex items-center gap-1.5 rounded-full bg-amber/10 px-3 py-1">
+            <div className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse-glow" />
+            <span className="text-[10px] font-bold text-amber uppercase tracking-wider">
+              Round {game.currentRoundIndex + 1}/{game.roundSequence.length}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -99,6 +110,12 @@ export default function ActiveGame() {
         title="Submit Game"
         message="This will finalize all scores and update player ELO ratings. This cannot be undone."
         confirmLabel="Submit"
+      />
+
+      <RewindModal
+        open={showRewind}
+        onClose={() => setShowRewind(false)}
+        game={game}
       />
     </motion.div>
   );
