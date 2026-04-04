@@ -139,7 +139,7 @@ export default function NewGame() {
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2">
-                {players.map((player) => {
+                {[...players].sort((a, b) => a.name.localeCompare(b.name)).map((player) => {
                   const selected = selectedIds.includes(player.id);
                   return (
                     <motion.button

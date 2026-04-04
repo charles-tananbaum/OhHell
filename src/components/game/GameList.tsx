@@ -214,7 +214,7 @@ export default function GameList() {
                           e.stopPropagation();
                           setDeleteId(game.id);
                         }}
-                        className="rounded-lg p-2 text-text-muted opacity-0 transition-all hover:bg-red/8 hover:text-red group-hover:opacity-100"
+                        className="rounded-lg p-2 text-text-muted transition-all hover:bg-red/8 hover:text-red sm:opacity-0 sm:group-hover:opacity-100"
                       >
                         <Trash2 size={14} />
                       </button>

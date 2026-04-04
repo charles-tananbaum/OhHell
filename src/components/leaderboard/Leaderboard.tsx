@@ -16,7 +16,7 @@ export default function Leaderboard() {
   const players = useStore((s) => s.players);
   const ranked = useMemo(
     () => [...players]
-      .filter((p) => p.stats.gamesPlayed > 0)
+      .filter((p) => p.stats.gamesPlayed >= 5)
       .sort((a, b) => b.elo - a.elo),
     [players],
   );
